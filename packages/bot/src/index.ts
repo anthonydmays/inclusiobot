@@ -1,71 +1,73 @@
-import {
-  ActionRowBuilder,
-  Client,
-  Events,
-  GatewayIntentBits,
-  ModalBuilder,
-  TextInputBuilder,
-  TextInputStyle,
-} from 'discord.js';
+import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
 import * as dotenv from 'dotenv';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'url';
+import { BotEvent, Command } from './types.js';
 
 dotenv.config();
 
-// Create a Client instance with our bot token.
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-// When the bot is connected and ready, log to console.
-client.once(Events.ClientReady, () => {
-  console.log('Connected and ready.');
-});
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Every time a message is sent anywhere the bot is present,
-// this event will fire and we will checbk if the bot was mentioned.
-// If it was, the bot will attempt to respond with "Present".
-client.on(Events.InteractionCreate, async (interaction) => {
-  if (interaction.isChatInputCommand()) {
-    // Create the modal
-    const modal = new ModalBuilder()
-      .setCustomId('communityCodeModal')
-      .setTitle('Please provide your community code');
+client.commands = new Collection();
+const foldersPath = path.join(__dirname, 'commands');
+const commandFolders = fs.readdirSync(foldersPath);
 
-    // Add components to modal
-
-    // Create the text input components
-    const communityCodeInput = new TextInputBuilder()
-      .setCustomId('communityCodeInput')
-      // The label is the prompt the user sees for this input
-      .setLabel('Community code')
-      // Short means only a single line of text
-      .setStyle(TextInputStyle.Short);
-
-    // An action row only holds one text input,
-    // so you need one action row per text input.
-    const firstActionRow = new ActionRowBuilder().addComponents(
-      communityCodeInput,
-    ) as ActionRowBuilder<TextInputBuilder>;
-
-    // Add inputs to the modal
-    modal.addComponents(firstActionRow);
-
-    // Show the modal to the user
-    await interaction.showModal(modal);
+for (const folder of commandFolders) {
+  const commandsPath = path.join(foldersPath, folder);
+  const commandFiles = fs
+    .readdirSync(commandsPath)
+    .filter((file) => file.endsWith('.js'));
+  for (const file of commandFiles) {
+    const filePath = path.join(commandsPath, file);
+    console.log(`Adding command ${file}`);
+    const command = (await import(filePath)).default as Command;
+    client.commands.set(command.data.name, command);
   }
+}
 
-  if (interaction.isModalSubmit()) {
-    if (interaction.customId === 'communityCodeModal') {
-      const communityCode =
-        interaction.fields.getTextInputValue('communityCodeInput');
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs
+  .readdirSync(eventsPath)
+  .filter((file) => file.endsWith('.js'));
+
+for (const file of eventFiles) {
+  const filePath = path.join(eventsPath, file);
+  console.log(`Adding event ${file}`);
+  const event = (await import(filePath)).default as BotEvent;
+  if (event.once) {
+    client.once(event.name, (...args) => event.execute(...args));
+  } else {
+    client.on(event.name, (...args) => event.execute(...args));
+  }
+}
+
+client.on(Events.InteractionCreate, async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
+
+  const command = client.commands.get(interaction.commandName);
+
+  if (!command) return;
+
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp({
+        content: 'There was an error while executing this command!',
+        ephemeral: true,
+      });
+    } else {
       await interaction.reply({
-        content: `Your code ${communityCode} was verified successfully!`,
+        content: 'There was an error while executing this command!',
         ephemeral: true,
       });
     }
   }
-});
-
-client.on('unhandledRejection', (err) => {
-  console.warn(err);
 });
 
 client.login(process.env.DISCORD_BOT_TOKEN);
