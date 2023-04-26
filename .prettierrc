@@ -15,15 +15,6 @@
     ],
     "plugins": [
         "prettier-plugin-organize-imports",
-        "prettier-plugin-jsdoc",
-        "prettier-plugin-svelte"
-    ],
-    "overrides": [
-        {
-            "files": "*.svelte",
-            "options": {
-                "parser": "svelte"
-            }
-        }
+        "prettier-plugin-jsdoc"
     ]
 }
