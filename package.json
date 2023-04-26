@@ -7,7 +7,7 @@
         "packages/*"
     ],
     "scripts": {
-        "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json,svelte}' --config ./.prettierrc",
+        "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json,svelte}' --config ./.prettierrc"
     },
     "keywords": [],
     "author": "",
@@ -27,7 +27,7 @@
         "eslint-plugin-svelte3": "^4.0.0",
         "prettier": "^2.7.1",
         "prettier-plugin-jsdoc": "^0.4.2",
-        "prettier-plugin-organize-imports": "^3.1.1",
+        "prettier-plugin-organize-imports": "^3.1.1"
     },
     "dependencies": {
         "typescript": "^4.9.5"
