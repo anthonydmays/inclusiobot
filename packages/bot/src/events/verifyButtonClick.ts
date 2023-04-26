@@ -2,20 +2,16 @@ import {
   ActionRowBuilder,
   Interaction,
   ModalBuilder,
-  SlashCommandBuilder,
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js';
-import { Command } from '../../types.js';
+import { BotEvent } from '../types.js';
 
-const command: Command = {
-  data: new SlashCommandBuilder()
-    .setName('verify')
-    .setDescription(
-      'Verifies the current user and assigns the appropriate role.',
-    ),
-  async execute(interaction: Interaction) {
-    if (!interaction.isChatInputCommand()) return;
+const event: BotEvent = {
+  name: 'interactionCreate',
+  execute: async (interaction: Interaction) => {
+    if (!interaction.isButton()) return;
+    if (interaction.customId !== 'verifyButton') return;
 
     // Create the modal
     const modal = new ModalBuilder()
@@ -46,4 +42,4 @@ const command: Command = {
   },
 };
 
-export default command;
+export default event;

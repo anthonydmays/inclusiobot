@@ -1,4 +1,8 @@
-import { Collection, Interaction, SlashCommandBuilder } from 'discord.js';
+import {
+  ChatInputCommandInteraction,
+  Collection,
+  SlashCommandBuilder,
+} from 'discord.js';
 
 declare global {
   namespace NodeJS {
@@ -12,7 +16,7 @@ declare global {
 
 export interface Command {
   data: SlashCommandBuilder;
-  execute: (interaction: Interaction) => void;
+  execute: (interaction: ChatInputCommandInteraction) => void;
 }
 
 export interface BotEvent {
