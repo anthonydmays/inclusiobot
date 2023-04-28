@@ -51,6 +51,7 @@ for (const file of eventFiles) {
 client.login(process.env.DISCORD_BOT_TOKEN);
 
 export const app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use('/v1', getApi(client));
 app.get('/', async (req, res) => {
