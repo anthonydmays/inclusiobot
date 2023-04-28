@@ -20,6 +20,8 @@ spec:
           image: docker.io/anthonydmays/inclusiobot:latest
           imagePullPolicy: Always
           env:
+            - name: INCLUSIO_BOT_VERSION
+              value: '1.0'
             - name: DISCORD_BOT_TOKEN
               valueFrom:
                 secretKeyRef:
