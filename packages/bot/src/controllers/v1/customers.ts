@@ -6,7 +6,7 @@ import { ROLE_BY_SKU } from '../../constants.js';
 export const getCustomersApi = (client: Client) => {
   const router = express.Router();
 
-  router.post('/:id/syncMembership', async function (req, res) {
+  router.post('/:id/syncMembership', async (req, res) => {
     const customerId = req.params.id;
 
     // Find all the active subscriptions for the customers from WP
