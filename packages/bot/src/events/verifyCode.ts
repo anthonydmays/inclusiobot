@@ -21,6 +21,9 @@ const event: BotEvent = {
     const subscriptions = await getActiveSubscriptionsByKey(subscriptionKey);
 
     if (subscriptions.length === 0) {
+      console.warn(
+        `Subscription for ${interaction.user.username} not verified.`,
+      );
       await interaction.followUp({
         content: `Your subscription **could not** be verified.`,
       });
@@ -42,6 +45,9 @@ const event: BotEvent = {
     await interaction.followUp({
       content: `Your subscription to **${subscriptionName}** was verified successfully!`,
     });
+    console.info(
+      `Subscription for ${interaction.user.username} verified via subscription ${subscriptionId}, sku ${subcriptionSku}.`,
+    );
   },
 };
 
