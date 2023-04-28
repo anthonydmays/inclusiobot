@@ -1,3 +1,4 @@
+import bodyParser from 'body-parser';
 import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import * as dotenv from 'dotenv';
 import express from 'express';
@@ -50,6 +51,7 @@ for (const file of eventFiles) {
 client.login(process.env.DISCORD_BOT_TOKEN);
 
 export const app = express();
+app.use(bodyParser.json());
 app.use('/v1', getApi(client));
 app.get('/', async (req, res) => {
   res.sendStatus(200);
