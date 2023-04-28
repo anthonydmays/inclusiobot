@@ -21,7 +21,7 @@ spec:
           imagePullPolicy: Always
           env:
             - name: INCLUSIO_BOT_VERSION
-              value: '1.0'
+              value: '1.1'
             - name: DISCORD_BOT_TOKEN
               valueFrom:
                 secretKeyRef:
