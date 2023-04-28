@@ -17,7 +17,7 @@ declare global {
   }
 }
 
-export interface Command {
+export interface SlashCommand {
   data: SlashCommandBuilder;
   execute: (interaction: ChatInputCommandInteraction) => void;
 }
@@ -31,7 +31,6 @@ export interface BotEvent {
 declare module 'discord.js' {
   export interface Client {
     commands: Collection<string, SlashCommand>;
-    commands: Collection<string, Command>;
     cooldowns: Collection<string, number>;
   }
 }

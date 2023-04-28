@@ -7,9 +7,9 @@ import {
   ChatInputCommandInteraction,
   SlashCommandBuilder,
 } from 'discord.js';
-import { Command } from '../../types.js';
+import { SlashCommand } from '../../types.js';
 
-const command: Command = {
+const command: SlashCommand = {
   data: new SlashCommandBuilder()
     .setName('initchannel')
     .setDescription('Initializes the verify channel.'),

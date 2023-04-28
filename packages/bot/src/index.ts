@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'url';
 import { getApi } from './controllers/v1/api.js';
-import { BotEvent, Command } from './types.js';
+import { BotEvent, SlashCommand } from './types.js';
 
 dotenv.config();
 
@@ -26,7 +26,7 @@ for (const folder of commandFolders) {
   for (const file of commandFiles) {
     const filePath = path.join(commandsPath, file);
     console.log(`Adding command ${file}`);
-    const command = (await import(filePath)).default as Command;
+    const command = (await import(filePath)).default as SlashCommand;
     client.commands.set(command.data.name, command);
   }
 }
