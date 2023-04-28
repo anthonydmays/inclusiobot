@@ -1,5 +1,5 @@
 {
-    "name": "@morganlatimer/inclusio-bot",
+    "name": "@morganlatimer/inclusiobot",
     "version": "1.0.0",
     "description": "",
     "main": "./dist/index.js",

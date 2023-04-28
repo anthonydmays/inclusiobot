@@ -28,6 +28,7 @@ dist
 
 # Keys
 firebaseServiceAccountKey.json
+secrets.yaml
 
 # Vim files
 *.swp
