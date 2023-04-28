@@ -1,19 +1,63 @@
-import { Interaction } from 'discord.js';
+import { Interaction, ModalSubmitInteraction } from 'discord.js';
+import {
+  getActiveSubscriptionsByKey,
+  updateSubscriptionCommunityUserId,
+} from '../api/wordpress.js';
+import { ROLE_BY_SKU } from '../constants.js';
 import { BotEvent } from '../types.js';
 
 const event: BotEvent = {
   name: 'interactionCreate',
   execute: async (interaction: Interaction) => {
     if (!interaction.isModalSubmit()) return;
-    if (interaction.customId !== 'communityCodeModal') return;
+    if (interaction.customId !== 'subscriptionKeyModal') return;
 
-    const communityCode =
-      interaction.fields.getTextInputValue('communityCodeInput');
-    await interaction.reply({
-      content: `Your code ${communityCode} was verified successfully!`,
-      ephemeral: true,
+    const subscriptionKey = interaction.fields.getTextInputValue(
+      'subscriptionKeyInput',
+    );
+
+    await interaction.deferReply({ ephemeral: true });
+
+    const subscriptions = await getActiveSubscriptionsByKey(subscriptionKey);
+
+    if (subscriptions.length === 0) {
+      await interaction.followUp({
+        content: `Your subscription **could not** be verified.`,
+      });
+      return;
+    }
+
+    const subcription = subscriptions[0];
+    const subscriptionId = subcription['id'];
+    const subscriptionName = subcription['mlc_subscription_name'];
+    const subcriptionSku = subcription['mlc_subscription_sku'];
+
+    await updateSubscriptionCommunityUserId(
+      subscriptionId,
+      interaction.user.username,
+    );
+
+    await setUserRoleBySku(interaction, subcriptionSku);
+
+    await interaction.followUp({
+      content: `Your subscription to **${subscriptionName}** was verified successfully!`,
     });
   },
 };
+
+async function setUserRoleBySku(
+  interaction: ModalSubmitInteraction,
+  sku: string,
+) {
+  const role = ROLE_BY_SKU[sku];
+  if (!role) {
+    return;
+  }
+
+  interaction.guild?.members.addRole({
+    user: interaction.user,
+    role,
+  });
+}
 
 export default event;

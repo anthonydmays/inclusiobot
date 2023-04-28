@@ -11,5 +11,7 @@
     "composite": true,
     "baseUrl": "./packages"
   },
-  "references": []
+  "references": [
+    { "path": "./packages/bot/" }
+  ]
 }

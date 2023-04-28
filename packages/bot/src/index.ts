@@ -1,8 +1,10 @@
 import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import * as dotenv from 'dotenv';
+import express from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'url';
+import { getApi } from './controllers/v1/api.js';
 import { BotEvent, Command } from './types.js';
 
 dotenv.config();
@@ -46,3 +48,8 @@ for (const file of eventFiles) {
 }
 
 client.login(process.env.DISCORD_BOT_TOKEN);
+
+export const app = express();
+app.use('/v1', getApi(client));
+app.listen(3000);
+console.log('Server started on port 3000');

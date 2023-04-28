@@ -10,6 +10,9 @@ declare global {
       DISCORD_BOT_TOKEN: string;
       DISCORD_CLIENT_ID: string;
       DISCORD_GUILD_ID: string;
+      WP_BEARER_TOKEN: string;
+      WP_API_HOST: string;
+      SKU_ROLES: string;
     }
   }
 }

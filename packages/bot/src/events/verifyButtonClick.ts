@@ -15,14 +15,14 @@ const event: BotEvent = {
 
     // Create the modal
     const modal = new ModalBuilder()
-      .setCustomId('communityCodeModal')
+      .setCustomId('subscriptionKeyModal')
       .setTitle('Provide your community code');
 
     // Add components to modal
 
     // Create the text input components
-    const communityCodeInput = new TextInputBuilder()
-      .setCustomId('communityCodeInput')
+    const subscriptionKeyInput = new TextInputBuilder()
+      .setCustomId('subscriptionKeyInput')
       // The label is the prompt the user sees for this input
       .setLabel('Community code')
       // Short means only a single line of text
@@ -31,7 +31,7 @@ const event: BotEvent = {
     // An action row only holds one text input,
     // so you need one action row per text input.
     const firstActionRow = new ActionRowBuilder().addComponents(
-      communityCodeInput,
+      subscriptionKeyInput,
     ) as ActionRowBuilder<TextInputBuilder>;
 
     // Add inputs to the modal
