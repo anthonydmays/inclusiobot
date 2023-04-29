@@ -4,7 +4,7 @@ import {
   getActiveSubscriptionsByCustomerId,
   getSubscriptionUsernameById,
 } from '../../api/wordpress.js';
-import { ROLE_BY_SKU } from '../../constants.js';
+import { ROLE_BY_SKU, SPECIAL_ROLE_IDS } from '../../constants.js';
 
 export const getCustomersApi = (client: Client) => {
   const router = express.Router();
@@ -64,7 +64,19 @@ export const getCustomersApi = (client: Client) => {
 
     if (!sku) {
       const member = (await guild.members.search({ query: username })).at(0);
+
+      // If the member is in a special role, leave them alone and just exit.
+      const isSpecialUser = member.roles.cache.hasAny(...SPECIAL_ROLE_IDS);
+      if (isSpecialUser) {
+        console.info(
+          `Member ${member.user.username} is special. Not removing roles.`,
+        );
+        return;
+      }
+
+      // Remove all roles from members with no subscription.
       member.roles.set([]);
+
       console.info(
         `All roles removed for customer ${customerId} with username ${username}.`,
       );
