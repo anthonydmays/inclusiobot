@@ -24,20 +24,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 client.commands = new Collection();
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs
+  .readdirSync(commandsPath)
+  .filter((file) => file.endsWith('.js'));
 
-for (const folder of commandFolders) {
-  const commandsPath = path.join(foldersPath, folder);
-  const commandFiles = fs
-    .readdirSync(commandsPath)
-    .filter((file) => file.endsWith('.js'));
-  for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    console.log(`Adding command ${file}`);
-    const command = (await import(filePath)).default as SlashCommand;
-    client.commands.set(command.data.name, command);
-  }
+for (const file of commandFiles) {
+  const filePath = path.join(commandsPath, file);
+  console.log(`Adding command ${file}`);
+  const command = (await import(filePath)).default as SlashCommand;
+  client.commands.set(command.data.name, command);
 }
 
 const eventsPath = path.join(__dirname, 'events');
