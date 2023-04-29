@@ -62,9 +62,6 @@ export const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use('/v1', getApi(client));
-app.get('/', async (req, res) => {
-  res.sendStatus(200);
-});
 
 async function onHealthCheck() {
   return true;
