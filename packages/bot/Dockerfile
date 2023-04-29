@@ -8,4 +8,7 @@ COPY . .
 RUN npm run build
 RUN npm run deploy-commands
 
+ARG API_VERSION
+ENV INCLUSIO_API_VERSION=$API_VERSION
+
 CMD [ "node", "dist/index.js" ]

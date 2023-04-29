@@ -1,7 +1,9 @@
+import { createTerminus } from '@godaddy/terminus';
 import bodyParser from 'body-parser';
 import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import * as dotenv from 'dotenv';
 import express from 'express';
+import { createServer } from 'http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'url';
@@ -64,6 +66,19 @@ app.get('/', async (req, res) => {
   res.sendStatus(200);
 });
 
+async function onHealthCheck() {
+  return true;
+}
+
+const server = createServer(app);
+createTerminus(server, {
+  signal: 'SIGINT',
+  healthChecks: { '/healthz': onHealthCheck },
+  statusOkResponse: {
+    version: process.env.INCLUSIO_API_VERSION || 'X.X.X',
+  },
+});
+
 const port = process.env.PORT || 3000;
-app.listen(port);
+server.listen(port);
 console.log(`Server started on port ${port}`);

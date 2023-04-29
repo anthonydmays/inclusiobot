@@ -1,8 +1,11 @@
 version: "3.9"
 services:
   api:
-    build: .
+    build: 
+      context: .
+      args:
+        - TAG_NAME
     ports:
-      - "80:3000"
+      - "3000:3000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
