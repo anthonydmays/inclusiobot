@@ -14,6 +14,7 @@ declare global {
       WP_API_HOST: string;
       SKU_ROLES: string;
       INCLUSIO_API_VERSION: string;
+      DISABLE_SERVER_FOR_TESTS: boolean;
     }
   }
 }

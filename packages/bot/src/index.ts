@@ -72,6 +72,8 @@ createTerminus(server, {
   },
 });
 
-const port = process.env.PORT || 3000;
-server.listen(port);
-console.log(`Server started on port ${port}`);
+if (!process.env.DISABLE_SERVER_FOR_TESTS) {
+  const port = process.env.PORT || 3000;
+  server.listen(port);
+  console.log(`Server started on port ${port}`);
+}

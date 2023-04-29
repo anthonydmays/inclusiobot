@@ -1,4 +1,4 @@
-import { Interaction, ModalSubmitInteraction } from 'discord.js';
+import { Events, Interaction, ModalSubmitInteraction } from 'discord.js';
 import {
   getActiveSubscriptionsByKey,
   updateSubscriptionCommunityUserId,
@@ -7,7 +7,7 @@ import { ROLE_BY_SKU } from '../constants.js';
 import { BotEvent } from '../types.js';
 
 const event: BotEvent = {
-  name: 'interactionCreate',
+  name: Events.InteractionCreate,
   execute: async (interaction: Interaction) => {
     if (!interaction.isModalSubmit()) return;
     if (interaction.customId !== 'subscriptionKeyModal') return;
@@ -31,9 +31,9 @@ const event: BotEvent = {
     }
 
     const subcription = subscriptions[0];
-    const subscriptionId = subcription['id'];
-    const subscriptionName = subcription['mlc_subscription_name'];
-    const subcriptionSku = subcription['mlc_subscription_sku'];
+    const subscriptionId = subcription.id;
+    const subscriptionName = subcription.mlc_subscription_name;
+    const subcriptionSku = subcription.mlc_subscription_sku;
 
     await updateSubscriptionCommunityUserId(
       subscriptionId,

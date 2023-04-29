@@ -9,7 +9,7 @@
         "deploy-commands": "node dist/deploy_commands.js",
         "start": "node dist/index.js",
         "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
-        "test": "NODE_OPTIONS=--experimental-vm-modules DOTENV_CONFIG_PATH=.env.test jest --watch --setupFiles dotenv/config"
+        "test": "NODE_OPTIONS=--experimental-vm-modules DOTENV_CONFIG_PATH=.env.test jest --watch --silent --setupFiles dotenv/config"
     },
     "keywords": [],
     "author": "",
