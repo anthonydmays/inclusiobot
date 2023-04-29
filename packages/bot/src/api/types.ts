@@ -1,5 +1,5 @@
 export declare interface WpSubscription {
-  id: string;
+  id: number;
   mlc_community_user_id: string;
   mlc_subscription_sku: string;
   mlc_subscription_name: string;

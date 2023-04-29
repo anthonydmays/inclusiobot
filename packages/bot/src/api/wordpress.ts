@@ -79,7 +79,7 @@ export async function getSubscriptionUsernameById(
 }
 
 export async function updateSubscriptionCommunityUserId(
-  subscriptionId: string,
+  subscriptionId: number,
   username: string,
 ) {
   const endpoint = `${process.env.WP_API_HOST}/wp-json/wp/v2/shop_subscription`;
@@ -105,6 +105,66 @@ export async function updateSubscriptionCommunityUserId(
   } catch (ex) {
     console.error(
       `Error updating community user id for ${username} subscription ${subscriptionId}:`,
+      ex,
+    );
+    throw ex;
+  }
+}
+
+export async function getSubscriptionIdsByUsername(
+  username: string,
+): Promise<number[]> {
+  console.info(`Fetching subscriptions with username ${username}.`);
+  const endpoint = `${process.env.WP_API_HOST}/wp-json/mlc/v1/subscriptions`;
+  const url = `${endpoint}?mlc_community_user_id=${username}&_fields=id`;
+  try {
+    const res = (await (
+      await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${Buffer.from(
+            process.env.WP_BEARER_TOKEN,
+            'utf-8',
+          ).toString('base64')}`,
+        },
+      })
+    ).json()) as Array<WpSubscription>;
+    return res.map((s) => s.id);
+  } catch (ex) {
+    console.error(`Error retrieving subscriptions by username:`, ex);
+    throw ex;
+  }
+}
+
+export async function updateSubscriptionsCommunityUserId(
+  subscriptionIds: readonly number[],
+  username: string,
+) {
+  console.info(
+    `Updating username ${username} for subscriptions`,
+    subscriptionIds,
+  );
+  const url = `${process.env.WP_API_HOST}/wp-json/mlc/v1/subscriptions`;
+  try {
+    const req = subscriptionIds.map((id) => ({
+      id,
+      meta: { mlc_community_user_id: username },
+    }));
+    await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${Buffer.from(
+          process.env.WP_BEARER_TOKEN,
+          'utf-8',
+        ).toString('base64')}`,
+      },
+      body: JSON.stringify(req),
+    });
+  } catch (ex) {
+    console.error(
+      `Error updating community user id for ${username} subscriptions:`,
       ex,
     );
     throw ex;
