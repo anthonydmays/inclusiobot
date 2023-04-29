@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+      "composite": true,
       "rootDir": "./src",
       "target": "esnext",
       "module": "node16",
