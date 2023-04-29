@@ -18,8 +18,6 @@ const { getActiveSubscriptionsByKey, updateSubscriptionCommunityUserId } =
 const verifyCode = (await import('./verify_code.js')).default;
 
 describe('verifyCode', () => {
-  beforeAll(() => {});
-
   it('listens to the correct event', async () => {
     expect(verifyCode.name).toEqual(Events.InteractionCreate);
   });
@@ -68,7 +66,7 @@ describe('verifyCode', () => {
     expect(interaction.deferReply).toHaveBeenCalledWith({ ephemeral: true });
     expect(mockGetActiveSubs).toHaveBeenCalledWith('blah');
     expect(interaction.followUp).toHaveBeenCalledWith({
-      content: `Your subscription **could not** be verified.`,
+      content: 'Your subscription **could not** be verified.',
     });
   });
 
@@ -110,5 +108,9 @@ describe('verifyCode', () => {
         role: '456789',
       }),
     );
+    expect(interaction.followUp).toHaveBeenCalledWith({
+      content:
+        'Your subscription to **Pro Subscription** was verified successfully!',
+    });
   });
 });
