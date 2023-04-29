@@ -34,15 +34,25 @@ const event: BotEvent = {
       return;
     }
 
-    await updateSubscriptionsCommunityUserId(
-      subscriptionIds,
-      after.user.username,
-    );
+    try {
+      await updateSubscriptionsCommunityUserId(
+        subscriptionIds,
+        after.user.username,
+      );
 
-    console.info(
-      `Username changed from ${beforeUsername} to ${afterUsername} for subscriptions`,
-      subscriptionIds,
-    );
+      console.info(
+        `Username changed from ${beforeUsername} to ${afterUsername} for subscriptions`,
+        subscriptionIds,
+      );
+    } catch (ex) {
+      // Remove all roles from the user to force re-verification.
+      after.roles.set([]);
+
+      console.info(
+        `Failed to update subscriptions for ${afterUsername}. Removing all roles.`,
+        subscriptionIds,
+      );
+    }
   },
 };
 
