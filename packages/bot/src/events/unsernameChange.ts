@@ -3,6 +3,7 @@ import {
   getSubscriptionIdsByUsername,
   updateSubscriptionsCommunityUserId,
 } from '../api/wordpress.js';
+import { SPECIAL_ROLE_IDS } from '../constants.js';
 import { BotEvent } from '../types.js';
 
 const event: BotEvent = {
@@ -45,6 +46,12 @@ const event: BotEvent = {
         subscriptionIds,
       );
     } catch (ex) {
+      const isSpecialUser = after.roles.cache.hasAny(...SPECIAL_ROLE_IDS);
+      if (isSpecialUser) {
+        console.info(`Member ${afterUsername} is special. Not removing roles.`);
+        return;
+      }
+
       // Remove all roles from the user to force re-verification.
       after.roles.set([]);
 

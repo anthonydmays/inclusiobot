@@ -9,3 +9,10 @@ export const ROLE_BY_SKU: Record<string, string> = Object.fromEntries(
     return [pair[0], pair[1]];
   }) || [],
 );
+
+/**
+ * A list of roles ids that protects users from having their roles removed if a
+ * sync error occurs.
+ */
+export const SPECIAL_ROLE_IDS: readonly string[] =
+  process.env.SPECIAL_ROLE_IDS?.split(',') || [];
