@@ -73,7 +73,7 @@ async function onHealthCheck() {
 const server = createServer(app);
 createTerminus(server, {
   signal: 'SIGINT',
-  healthChecks: { '/healthz': onHealthCheck },
+  healthChecks: { '/healthcheck': onHealthCheck },
   statusOkResponse: {
     version: process.env.INCLUSIO_API_VERSION || 'X.X.X',
   },
