@@ -53,7 +53,7 @@ export async function getActiveSubscriptionsByCustomerId(
   }
 }
 
-export async function getSubscriptionUsernameById(
+export async function getUserIdBySubscriptionId(
   subscriptionId: string,
 ): Promise<string | undefined> {
   console.info(`Fetching subscription with ID ${subscriptionId}.`);
@@ -79,12 +79,12 @@ export async function getSubscriptionUsernameById(
   }
 }
 
-export async function getSubscriptionIdsByUsername(
-  username: string,
+export async function getSubscriptionIdsByUserId(
+  userId: string,
 ): Promise<number[]> {
-  console.info(`Fetching subscriptions with username ${username}.`);
+  console.info(`Fetching subscriptions with userId ${userId}.`);
   const endpoint = `${process.env.WP_API_HOST}/wp-json/mlc/v1/subscriptions`;
-  const url = `${endpoint}?mlc_community_user_id=${username}&_fields=id`;
+  const url = `${endpoint}?mlc_community_user_id=${userId}&_fields=id`;
   try {
     const res = (await (
       await fetch(url, {
@@ -100,12 +100,12 @@ export async function getSubscriptionIdsByUsername(
     ).json()) as Array<WpSubscription>;
     return res.map((s) => s.id);
   } catch (ex) {
-    console.error(`Error retrieving subscriptions by username:`, ex);
+    console.error(`Error retrieving subscriptions by userId:`, ex);
     throw ex;
   }
 }
 
-export async function updateSubscriptionsCommunityUserId(
+export async function updateSubscriptionsCommunityUsername(
   subscriptionIds: readonly number[],
   username: string,
 ) {
@@ -117,7 +117,7 @@ export async function updateSubscriptionsCommunityUserId(
   try {
     const req = subscriptionIds.map((id) => ({
       id,
-      meta: { mlc_community_user_id: username },
+      meta: { mlc_community_username: username },
     }));
     await fetch(url, {
       method: 'PUT',
@@ -132,7 +132,7 @@ export async function updateSubscriptionsCommunityUserId(
     });
   } catch (ex) {
     console.error(
-      `Error updating community user id for ${username} subscriptions:`,
+      `Error updating community username for ${username} subscriptions:`,
       ex,
     );
     throw ex;

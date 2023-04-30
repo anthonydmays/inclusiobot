@@ -1,9 +1,8 @@
 import { Events, GuildMember } from 'discord.js';
 import {
-  getSubscriptionIdsByUsername,
-  updateSubscriptionsCommunityUserId,
+  getSubscriptionIdsByUserId,
+  updateSubscriptionsCommunityUsername,
 } from '../api/wordpress.js';
-import { SPECIAL_ROLE_IDS } from '../constants.js';
 import { BotEvent } from '../types.js';
 
 const event: BotEvent = {
@@ -26,17 +25,17 @@ const event: BotEvent = {
       `Changing subscription username from ${beforeUsername} to ${afterUsername}`,
     );
 
-    const subscriptionIds = await getSubscriptionIdsByUsername(
-      before.user.username,
-    );
+    const subscriptionIds = await getSubscriptionIdsByUserId(before.user.id);
 
     if (!subscriptionIds.length) {
-      console.warn(`No subscriptions found for ${beforeUsername}.`);
+      console.warn(
+        `No subscriptions found for ${beforeUsername} (${before.user.id}).`,
+      );
       return;
     }
 
     try {
-      await updateSubscriptionsCommunityUserId(
+      await updateSubscriptionsCommunityUsername(
         subscriptionIds,
         after.user.username,
       );
@@ -46,17 +45,8 @@ const event: BotEvent = {
         subscriptionIds,
       );
     } catch (ex) {
-      const isSpecialUser = after.roles.cache.hasAny(...SPECIAL_ROLE_IDS);
-      if (isSpecialUser) {
-        console.info(`Member ${afterUsername} is special. Not removing roles.`);
-        return;
-      }
-
-      // Remove all roles from the user to force re-verification.
-      after.roles.set([]);
-
       console.info(
-        `Failed to update subscriptions for ${afterUsername}. Removing all roles.`,
+        `Failed to update subscriptions for ${afterUsername}.`,
         subscriptionIds,
       );
     }

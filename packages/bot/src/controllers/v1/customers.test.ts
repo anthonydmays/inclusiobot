@@ -7,7 +7,7 @@ import { WpSubscription } from '../../api/types.js';
 
 jest.unstable_mockModule('../../api/wordpress.js', () => ({
   getActiveSubscriptionsByCustomerId: jest.fn(),
-  getSubscriptionUsernameById: jest.fn(),
+  getUserIdBySubscriptionId: jest.fn(),
 }));
 jest.unstable_mockModule('../../constants.js', () => ({
   ROLE_BY_SKU: {
@@ -47,7 +47,7 @@ describe('customers', () => {
 
     guild = {
       members: {
-        search: jest.fn(),
+        fetch: jest.fn(),
       },
       roles: {
         resolve: jest.fn(),
@@ -56,6 +56,7 @@ describe('customers', () => {
 
     member = {
       user: {
+        id: '67234825',
         username: 'blahuser',
       },
       roles: {
@@ -80,7 +81,7 @@ describe('customers', () => {
       wordpress.getActiveSubscriptionsByCustomerId,
     );
     mockGetActiveSubs.mockResolvedValue([]);
-    const mockGetUsername = jest.mocked(wordpress.getSubscriptionUsernameById);
+    const mockGetUserId = jest.mocked(wordpress.getUserIdBySubscriptionId);
 
     // Act
     const res = await request(app).put('/365/syncMembership');
@@ -88,17 +89,17 @@ describe('customers', () => {
     // Assert
     expect(res.status).toBe(200);
     expect(res.text).toBe('Member not verified.');
-    expect(mockGetUsername).not.toHaveBeenCalled();
+    expect(mockGetUserId).not.toHaveBeenCalled();
   });
 
-  it('attempts to locate username using provided subscription', async () => {
+  it('attempts to locate userID using provided subscription', async () => {
     // Arrange
     const mockGetActiveSubs = jest.mocked(
       wordpress.getActiveSubscriptionsByCustomerId,
     );
     mockGetActiveSubs.mockResolvedValue([]);
-    const mockGetUsername = jest.mocked(wordpress.getSubscriptionUsernameById);
-    mockGetUsername.mockResolvedValue('');
+    const mockGetUserId = jest.mocked(wordpress.getUserIdBySubscriptionId);
+    mockGetUserId.mockResolvedValue('');
 
     // Act
     const res = await request(app)
@@ -108,16 +109,16 @@ describe('customers', () => {
     // Assert
     expect(res.status).toBe(200);
     expect(res.text).toBe('Member not verified.');
-    expect(mockGetUsername).toHaveBeenCalledWith('adm');
+    expect(mockGetUserId).toHaveBeenCalledWith('adm');
   });
 
-  it('uses max level subscription username', async () => {
+  it('uses max level subscription userID', async () => {
     // Arrange
     const mockGetActiveSubs = jest.mocked(
       wordpress.getActiveSubscriptionsByCustomerId,
     );
     mockGetActiveSubs.mockResolvedValue(TEST_SUBSCRIPTIONS);
-    const mockGetUsername = jest.mocked(wordpress.getSubscriptionUsernameById);
+    const mockGetUserId = jest.mocked(wordpress.getUserIdBySubscriptionId);
 
     // Act
     const res = await request(app)
@@ -125,17 +126,17 @@ describe('customers', () => {
       .send({ subscriptionId: 'adm' });
 
     // Assert
-    expect(mockGetUsername).not.toHaveBeenCalled();
+    expect(mockGetUserId).not.toHaveBeenCalled();
   });
 
-  it("uses provided subscription's username", async () => {
+  it("uses provided subscription's userID", async () => {
     // Arrange
     const mockGetActiveSubs = jest.mocked(
       wordpress.getActiveSubscriptionsByCustomerId,
     );
     mockGetActiveSubs.mockResolvedValue([]);
-    const mockGetUsername = jest.mocked(wordpress.getSubscriptionUsernameById);
-    mockGetUsername.mockResolvedValue('anothername');
+    const mockGetUserId = jest.mocked(wordpress.getUserIdBySubscriptionId);
+    mockGetUserId.mockResolvedValue('67234825');
 
     // Act
     const res = await request(app)
@@ -143,7 +144,7 @@ describe('customers', () => {
       .send({ subscriptionId: 'adm' });
 
     // Assert
-    expect(mockGetUsername).toHaveBeenCalledWith('adm');
+    expect(mockGetUserId).toHaveBeenCalledWith('adm');
   });
 
   it('returns error when guild not found', async () => {
@@ -152,7 +153,7 @@ describe('customers', () => {
       wordpress.getActiveSubscriptionsByCustomerId,
     );
     mockGetActiveSubs.mockResolvedValue(TEST_SUBSCRIPTIONS);
-    const mockGetUsername = jest.mocked(wordpress.getSubscriptionUsernameById);
+    const mockGetUserId = jest.mocked(wordpress.getUserIdBySubscriptionId);
 
     // Act
     const res = await request(app)
@@ -171,7 +172,7 @@ describe('customers', () => {
     );
     mockGetActiveSubs.mockResolvedValue(TEST_SUBSCRIPTIONS);
     jest.mocked(client.guilds.resolve).mockReturnValue(guild);
-    jest.mocked(guild.members.search).mockResolvedValue(new Collection());
+    jest.mocked(guild.members.fetch).mockResolvedValue(undefined);
 
     // Act
     const res = await request(app).put('/365/syncMembership');
@@ -187,12 +188,12 @@ describe('customers', () => {
       wordpress.getActiveSubscriptionsByCustomerId,
     );
     mockGetActiveSubs.mockResolvedValue([]);
-    const mockGetUsername = jest.mocked(wordpress.getSubscriptionUsernameById);
-    mockGetUsername.mockResolvedValue('anothername');
+    const mockGetUserId = jest.mocked(wordpress.getUserIdBySubscriptionId);
+    mockGetUserId.mockResolvedValue('67234825');
     jest.mocked(client.guilds.resolve).mockReturnValue(guild);
     jest
-      .mocked(guild.members.search)
-      .mockResolvedValue(new Collection([['id', member]]));
+      .mocked(guild.members.fetch)
+      .mockResolvedValue(member as unknown as Collection<string, GuildMember>);
 
     // Act
     const res = await request(app)
@@ -202,7 +203,7 @@ describe('customers', () => {
     // Assert
     expect(res.status).toBe(200);
     expect(res.text).toBe(
-      'All roles removed from customer 365 with username anothername.',
+      'All roles removed from customer 365 with userId 67234825.',
     );
     expect(member.roles.set).toHaveBeenCalledWith([]);
   });
@@ -213,12 +214,12 @@ describe('customers', () => {
       wordpress.getActiveSubscriptionsByCustomerId,
     );
     mockGetActiveSubs.mockResolvedValue([]);
-    const mockGetUsername = jest.mocked(wordpress.getSubscriptionUsernameById);
-    mockGetUsername.mockResolvedValue('anothername');
+    const mockGetUserId = jest.mocked(wordpress.getUserIdBySubscriptionId);
+    mockGetUserId.mockResolvedValue('67234825');
     jest.mocked(client.guilds.resolve).mockReturnValue(guild);
     jest
-      .mocked(guild.members.search)
-      .mockResolvedValue(new Collection([['id', member]]));
+      .mocked(guild.members.fetch)
+      .mockResolvedValue(member as unknown as Collection<string, GuildMember>);
     jest.mocked(member.roles.cache.hasAny).mockReturnValue(true);
 
     // Act
@@ -228,7 +229,7 @@ describe('customers', () => {
 
     // Assert
     expect(res.status).toBe(200);
-    expect(res.text).toBe('Member anothername is special. Not removing roles.');
+    expect(res.text).toBe('Member 67234825 is special. Not removing roles.');
     expect(member.roles.cache.hasAny).toHaveBeenCalledWith('pqr', 'xyz');
     expect(member.roles.set).not.toHaveBeenCalled();
   });
@@ -241,8 +242,8 @@ describe('customers', () => {
     mockGetActiveSubs.mockResolvedValue(TEST_SUBSCRIPTIONS);
     jest.mocked(client.guilds.resolve).mockReturnValue(guild);
     jest
-      .mocked(guild.members.search)
-      .mockResolvedValue(new Collection([['id', member]]));
+      .mocked(guild.members.fetch)
+      .mockResolvedValue(member as unknown as Collection<string, GuildMember>);
 
     // Act
     const res = await request(app).put('/365/syncMembership');
@@ -260,8 +261,8 @@ describe('customers', () => {
     mockGetActiveSubs.mockResolvedValue([TEST_SUBSCRIPTION_SKU5]);
     jest.mocked(client.guilds.resolve).mockReturnValue(guild);
     jest
-      .mocked(guild.members.search)
-      .mockResolvedValue(new Collection([['id', member]]));
+      .mocked(guild.members.fetch)
+      .mockResolvedValue(member as unknown as Collection<string, GuildMember>);
     jest.mocked(member.roles.cache.hasAny).mockReturnValue(true);
 
     // Act
@@ -281,8 +282,8 @@ describe('customers', () => {
     mockGetActiveSubs.mockResolvedValue([TEST_SUBSCRIPTION_SKU5]);
     jest.mocked(client.guilds.resolve).mockReturnValue(guild);
     jest
-      .mocked(guild.members.search)
-      .mockResolvedValue(new Collection([['id', member]]));
+      .mocked(guild.members.fetch)
+      .mockResolvedValue(member as unknown as Collection<string, GuildMember>);
     jest.mocked(member.roles.cache.hasAny).mockReturnValue(true);
     const fakeRole = {} as unknown as Role;
     jest.mocked(guild.roles.resolve).mockReturnValue(fakeRole);
@@ -303,8 +304,8 @@ describe('customers', () => {
     mockGetActiveSubs.mockResolvedValue([TEST_SUBSCRIPTION_SKU5]);
     jest.mocked(client.guilds.resolve).mockReturnValue(guild);
     jest
-      .mocked(guild.members.search)
-      .mockResolvedValue(new Collection([['id', member]]));
+      .mocked(guild.members.fetch)
+      .mockResolvedValue(member as unknown as Collection<string, GuildMember>);
     jest.mocked(member.roles.cache.hasAny).mockReturnValue(true);
     const fakeRole = {} as unknown as Role;
     jest.mocked(guild.roles.resolve).mockReturnValue(fakeRole);

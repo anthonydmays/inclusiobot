@@ -104,14 +104,12 @@ describe('wordpress', () => {
     );
 
     // Act
-    const subscriptions = await wordpress.getSubscriptionIdsByUsername(
-      'amaysing',
-    );
+    const subscriptions = await wordpress.getSubscriptionIdsByUserId('2341256');
 
     // Assert
     expect(subscriptions).toEqual([1234]);
     expect(mockFetch).toHaveBeenCalledWith(
-      'https://wp.com/wp-json/mlc/v1/subscriptions?mlc_community_user_id=amaysing&_fields=id',
+      'https://wp.com/wp-json/mlc/v1/subscriptions?mlc_community_user_id=2341256&_fields=id',
       {
         headers: {
           Authorization: 'Basic YWJjMTIz',
@@ -127,7 +125,7 @@ describe('wordpress', () => {
     mockFetch.mockRejectedValue(new Error());
 
     // Act
-    const subscriptions$ = wordpress.getSubscriptionIdsByUsername('amaysing');
+    const subscriptions$ = wordpress.getSubscriptionIdsByUserId('2341256');
 
     // Assert
     expect(subscriptions$).rejects.toEqual(new Error());
@@ -146,7 +144,7 @@ describe('wordpress', () => {
     );
 
     // Act
-    const username = await wordpress.getSubscriptionUsernameById('5678');
+    const username = await wordpress.getUserIdBySubscriptionId('5678');
 
     // Assert
     expect(username).toEqual('testUserId');
@@ -167,7 +165,7 @@ describe('wordpress', () => {
     mockFetch.mockRejectedValue(new Error());
 
     // Act
-    const username$ = wordpress.getSubscriptionUsernameById('5678');
+    const username$ = wordpress.getUserIdBySubscriptionId('5678');
 
     // Assert
     expect(username$).rejects.toEqual(new Error());
@@ -175,7 +173,7 @@ describe('wordpress', () => {
 
   it('updateSubscriptionsCommunityUserId', async () => {
     // Act
-    await wordpress.updateSubscriptionsCommunityUserId(
+    await wordpress.updateSubscriptionsCommunityUsername(
       [456, 789],
       'testCommId',
     );
@@ -189,7 +187,7 @@ describe('wordpress', () => {
           'Content-Type': 'application/json',
         },
         method: 'PUT',
-        body: '[{"id":456,"meta":{"mlc_community_user_id":"testCommId"}},{"id":789,"meta":{"mlc_community_user_id":"testCommId"}}]',
+        body: '[{"id":456,"meta":{"mlc_community_username":"testCommId"}},{"id":789,"meta":{"mlc_community_username":"testCommId"}}]',
       },
     );
   });
@@ -199,9 +197,9 @@ describe('wordpress', () => {
     mockFetch.mockRejectedValue(new Error());
 
     // Act
-    const result$ = wordpress.updateSubscriptionsCommunityUserId(
+    const result$ = wordpress.updateSubscriptionsCommunityUsername(
       [456, 789],
-      'testCommId',
+      '231241512',
     );
 
     // Assert

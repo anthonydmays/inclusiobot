@@ -2,7 +2,7 @@ import { Client } from 'discord.js';
 import express from 'express';
 import {
   getActiveSubscriptionsByCustomerId,
-  getSubscriptionUsernameById,
+  getUserIdBySubscriptionId,
 } from '../../api/wordpress.js';
 import { ROLE_BY_SKU, SPECIAL_ROLE_IDS } from '../../constants.js';
 
@@ -25,16 +25,16 @@ export const getCustomersApi = (client: Client) => {
 
     // Get community id and sku from subscription
     const sku = maxSubscription?.mlc_subscription_sku;
-    let username = maxSubscription?.meta_data.find(
+    let userId = maxSubscription?.meta_data.find(
       (m) => m.key === 'mlc_community_user_id',
     )?.value;
 
-    // If there are no active subscriptions, then use the provided subscription ID to pull a username.
-    if (!username && req.body?.subscriptionId) {
-      username = await getSubscriptionUsernameById(req.body.subscriptionId);
+    // If there are no active subscriptions, then use the provided subscription ID to pull a userId.
+    if (!userId && req.body?.subscriptionId) {
+      userId = await getUserIdBySubscriptionId(req.body.subscriptionId);
     }
 
-    if (!username) {
+    if (!userId) {
       console.warn(
         `Cannot sync. Membership for customer ${customerId} not verified yet or verification failed.`,
       );
@@ -42,7 +42,7 @@ export const getCustomersApi = (client: Client) => {
       return;
     }
 
-    console.info(`Found username ${username} for customer ${customerId}.`);
+    console.info(`Found userId ${userId} for customer ${customerId}.`);
 
     const guild = client.guilds.resolve(process.env.DISCORD_GUILD_ID);
     if (!guild) {
@@ -53,25 +53,23 @@ export const getCustomersApi = (client: Client) => {
       return;
     }
 
-    const member = (await guild.members.search({ query: username })).at(0);
+    const member = await guild.members.fetch(userId);
     if (!member) {
       console.warn(
-        `Cannot sync. Account with username ${username} for customer ${customerId} not found in guild.`,
+        `Cannot sync. Account with userId ${userId} for customer ${customerId} not found in guild.`,
       );
       res.status(422).send(`Customer ${customerId} could not be updated.`);
       return;
     }
 
     if (!sku) {
-      const member = (await guild.members.search({ query: username })).at(0);
-
       // If the member is in a special role, leave them alone and just exit.
       const isSpecialUser = member.roles.cache.hasAny(...SPECIAL_ROLE_IDS);
       if (isSpecialUser) {
-        console.info(`Member ${username} is special. Not removing roles.`);
+        console.info(`Member ${userId} is special. Not removing roles.`);
         res
           .status(200)
-          .send(`Member ${username} is special. Not removing roles.`);
+          .send(`Member ${userId} is special. Not removing roles.`);
         return;
       }
 
@@ -79,12 +77,12 @@ export const getCustomersApi = (client: Client) => {
       await member.roles.set([]);
 
       console.info(
-        `All roles removed for customer ${customerId} with username ${username}.`,
+        `All roles removed for customer ${customerId} with userId ${userId}.`,
       );
       res
         .status(200)
         .send(
-          `All roles removed from customer ${customerId} with username ${username}.`,
+          `All roles removed from customer ${customerId} with userId ${userId}.`,
         );
       return;
     }

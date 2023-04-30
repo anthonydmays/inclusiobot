@@ -4,7 +4,7 @@ import { WpSubscription } from '../api/types.js';
 
 jest.unstable_mockModule('../api/wordpress.js', () => ({
   getActiveSubscriptionsByKey: jest.fn(),
-  updateSubscriptionsCommunityUserId: jest.fn(),
+  updateSubscriptionsCommunityUsername: jest.fn(),
 }));
 jest.unstable_mockModule('../constants.js', () => ({
   ROLE_BY_SKU: {
@@ -12,7 +12,7 @@ jest.unstable_mockModule('../constants.js', () => ({
   },
 }));
 
-const { getActiveSubscriptionsByKey, updateSubscriptionsCommunityUserId } =
+const { getActiveSubscriptionsByKey, updateSubscriptionsCommunityUsername } =
   await import('../api/wordpress.js');
 const verifyCode = (await import('./verify_code.js')).default;
 
@@ -84,6 +84,7 @@ describe('verifyCode', () => {
       isModalSubmit: jest.fn().mockReturnValue(true),
       customId: 'subscriptionKeyModal',
       user: {
+        id: '231241512',
         username: 'testuser',
       },
       deferReply: jest.fn(),
@@ -105,7 +106,7 @@ describe('verifyCode', () => {
         mlc_subscription_sku: '789',
       } as WpSubscription,
     ]);
-    const mockUpdateSub = jest.mocked(updateSubscriptionsCommunityUserId);
+    const mockUpdateSub = jest.mocked(updateSubscriptionsCommunityUsername);
 
     // Act
     await verifyCode.execute(interaction);
