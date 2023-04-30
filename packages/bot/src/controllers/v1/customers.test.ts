@@ -172,7 +172,11 @@ describe('customers', () => {
     );
     mockGetActiveSubs.mockResolvedValue(TEST_SUBSCRIPTIONS);
     jest.mocked(client.guilds.resolve).mockReturnValue(guild);
-    jest.mocked(guild.members.fetch).mockResolvedValue(undefined);
+    jest
+      .mocked(guild.members.fetch)
+      .mockResolvedValue(
+        undefined as unknown as Collection<string, GuildMember>,
+      );
 
     // Act
     const res = await request(app).put('/365/syncMembership');

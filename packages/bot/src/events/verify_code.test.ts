@@ -4,7 +4,7 @@ import { WpSubscription } from '../api/types.js';
 
 jest.unstable_mockModule('../api/wordpress.js', () => ({
   getActiveSubscriptionsByKey: jest.fn(),
-  updateSubscriptionsCommunityUsername: jest.fn(),
+  updateSubscriptionsCommunityUser: jest.fn(),
 }));
 jest.unstable_mockModule('../constants.js', () => ({
   ROLE_BY_SKU: {
@@ -12,8 +12,10 @@ jest.unstable_mockModule('../constants.js', () => ({
   },
 }));
 
-const { getActiveSubscriptionsByKey, updateSubscriptionsCommunityUsername } =
-  await import('../api/wordpress.js');
+const {
+  getActiveSubscriptionsByKey,
+  updateSubscriptionsCommunityUser: updateSubscriptionsCommunityUser,
+} = await import('../api/wordpress.js');
 const verifyCode = (await import('./verify_code.js')).default;
 
 describe('verifyCode', () => {
@@ -56,6 +58,7 @@ describe('verifyCode', () => {
       isModalSubmit: jest.fn().mockReturnValue(true),
       customId: 'subscriptionKeyModal',
       user: {
+        id: '231241512',
         username: 'testuser',
       },
       deferReply: jest.fn(),
@@ -106,15 +109,18 @@ describe('verifyCode', () => {
         mlc_subscription_sku: '789',
       } as WpSubscription,
     ]);
-    const mockUpdateSub = jest.mocked(updateSubscriptionsCommunityUsername);
+    const mockUpdateSub = jest.mocked(updateSubscriptionsCommunityUser);
 
     // Act
     await verifyCode.execute(interaction);
 
     // Assert
     expect(mockGetActiveSubs).toHaveBeenCalledWith('blah');
-    expect(mockUpdateSub).toHaveBeenCalledWith([123], 'testuser');
-    expect(interaction.guild.members.addRole).toHaveBeenCalledWith(
+    expect(mockUpdateSub).toHaveBeenCalledWith([123], {
+      userId: '231241512',
+      username: 'testuser',
+    });
+    expect(interaction.guild?.members.addRole).toHaveBeenCalledWith(
       expect.objectContaining({
         user: interaction.user,
         role: '456789',
@@ -158,6 +164,6 @@ describe('verifyCode', () => {
     await verifyCode.execute(interaction);
 
     // Assert
-    expect(interaction.guild.members.addRole).not.toHaveBeenCalled();
+    expect(interaction.guild?.members.addRole).not.toHaveBeenCalled();
   });
 });

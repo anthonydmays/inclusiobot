@@ -1,7 +1,7 @@
 import { Events, Interaction, ModalSubmitInteraction } from 'discord.js';
 import {
   getActiveSubscriptionsByKey,
-  updateSubscriptionsCommunityUsername,
+  updateSubscriptionsCommunityUser,
 } from '../api/wordpress.js';
 import { ROLE_BY_SKU } from '../constants.js';
 import { BotEvent } from '../types.js';
@@ -35,10 +35,10 @@ const event: BotEvent = {
     const subscriptionName = subcription.mlc_subscription_name;
     const subcriptionSku = subcription.mlc_subscription_sku;
 
-    await updateSubscriptionsCommunityUsername(
-      [subscriptionId],
-      interaction.user.username,
-    );
+    await updateSubscriptionsCommunityUser([subscriptionId], {
+      userId: interaction.user.id,
+      username: interaction.user.username,
+    });
 
     await setUserRoleBySku(interaction, subcriptionSku);
 

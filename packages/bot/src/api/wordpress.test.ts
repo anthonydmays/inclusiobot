@@ -171,12 +171,12 @@ describe('wordpress', () => {
     expect(username$).rejects.toEqual(new Error());
   });
 
-  it('updateSubscriptionsCommunityUserId', async () => {
+  it('updateSubscriptionsCommunityUser', async () => {
     // Act
-    await wordpress.updateSubscriptionsCommunityUsername(
-      [456, 789],
-      'testCommId',
-    );
+    await wordpress.updateSubscriptionsCommunityUser([456, 789], {
+      userId: '63423523',
+      username: 'testCommId',
+    });
 
     // Assert
     expect(mockFetch).toHaveBeenCalledWith(
@@ -187,7 +187,7 @@ describe('wordpress', () => {
           'Content-Type': 'application/json',
         },
         method: 'PUT',
-        body: '[{"id":456,"meta":{"mlc_community_username":"testCommId"}},{"id":789,"meta":{"mlc_community_username":"testCommId"}}]',
+        body: '[{"id":456,"meta":{"mlc_community_user_id":"63423523","mlc_community_username":"testCommId"}},{"id":789,"meta":{"mlc_community_user_id":"63423523","mlc_community_username":"testCommId"}}]',
       },
     );
   });
@@ -197,10 +197,10 @@ describe('wordpress', () => {
     mockFetch.mockRejectedValue(new Error());
 
     // Act
-    const result$ = wordpress.updateSubscriptionsCommunityUsername(
-      [456, 789],
-      '231241512',
-    );
+    const result$ = wordpress.updateSubscriptionsCommunityUser([456, 789], {
+      userId: '63423523',
+      username: 'testCommId',
+    });
 
     // Assert
     expect(result$).rejects.toEqual(new Error());

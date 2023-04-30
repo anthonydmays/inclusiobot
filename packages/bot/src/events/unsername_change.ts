@@ -1,7 +1,7 @@
 import { Events, GuildMember } from 'discord.js';
 import {
   getSubscriptionIdsByUserId,
-  updateSubscriptionsCommunityUsername,
+  updateSubscriptionsCommunityUser,
 } from '../api/wordpress.js';
 import { BotEvent } from '../types.js';
 
@@ -35,10 +35,10 @@ const event: BotEvent = {
     }
 
     try {
-      await updateSubscriptionsCommunityUsername(
-        subscriptionIds,
-        after.user.username,
-      );
+      await updateSubscriptionsCommunityUser(subscriptionIds, {
+        userId: after.user.id,
+        username: after.user.username,
+      });
 
       console.info(
         `Username changed from ${beforeUsername} to ${afterUsername} for subscriptions`,

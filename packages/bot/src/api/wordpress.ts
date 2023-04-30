@@ -105,19 +105,20 @@ export async function getSubscriptionIdsByUserId(
   }
 }
 
-export async function updateSubscriptionsCommunityUsername(
+export async function updateSubscriptionsCommunityUser(
   subscriptionIds: readonly number[],
-  username: string,
+  userInfo: { username: string; userId: string },
 ) {
+  const { userId, username } = userInfo;
   console.info(
-    `Updating username ${username} for subscriptions`,
+    `Updating username ${username} (${userId}) for subscriptions`,
     subscriptionIds,
   );
   const url = `${process.env.WP_API_HOST}/wp-json/mlc/v1/subscriptions`;
   try {
     const req = subscriptionIds.map((id) => ({
       id,
-      meta: { mlc_community_username: username },
+      meta: { mlc_community_user_id: userId, mlc_community_username: username },
     }));
     await fetch(url, {
       method: 'PUT',
