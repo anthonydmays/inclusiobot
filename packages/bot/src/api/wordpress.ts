@@ -1,3 +1,4 @@
+import fetch from 'node-fetch';
 import { WpSubscription } from './types.js';
 
 export async function getActiveSubscriptionsByKey(
@@ -27,7 +28,7 @@ export async function getActiveSubscriptionsByKey(
 }
 
 export async function getActiveSubscriptionsByCustomerId(
-  customerId: string,
+  customerId: number,
 ): Promise<Array<WpSubscription>> {
   console.info(`Fetching active subscriptions for customer ${customerId}.`);
   const endpoint = `${process.env.WP_API_HOST}/wp-json/mlc/v1/subscriptions`;
@@ -74,39 +75,6 @@ export async function getSubscriptionUsernameById(
     return res?.meta?.mlc_community_user_id;
   } catch (ex) {
     console.error(`Error retrieving subscriptions by key:`, ex);
-    throw ex;
-  }
-}
-
-export async function updateSubscriptionCommunityUserId(
-  subscriptionId: number,
-  username: string,
-) {
-  const endpoint = `${process.env.WP_API_HOST}/wp-json/wp/v2/shop_subscription`;
-  const url = `${endpoint}/${subscriptionId}`;
-  try {
-    const res = await (
-      await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Basic ${Buffer.from(
-            process.env.WP_BEARER_TOKEN,
-            'utf-8',
-          ).toString('base64')}`,
-        },
-        body: JSON.stringify({
-          meta: {
-            mlc_community_user_id: username,
-          },
-        }),
-      })
-    ).json();
-  } catch (ex) {
-    console.error(
-      `Error updating community user id for ${username} subscription ${subscriptionId}:`,
-      ex,
-    );
     throw ex;
   }
 }

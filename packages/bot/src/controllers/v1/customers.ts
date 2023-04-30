@@ -10,7 +10,7 @@ export const getCustomersApi = (client: Client) => {
   const router = express.Router();
 
   router.put('/:id/syncMembership', async (req, res) => {
-    const customerId = req.params.id;
+    const customerId = +req.params.id;
     console.info(`Syncing membership for ${customerId}.`);
 
     // Find all the active subscriptions for the customers from WP
@@ -68,14 +68,15 @@ export const getCustomersApi = (client: Client) => {
       // If the member is in a special role, leave them alone and just exit.
       const isSpecialUser = member.roles.cache.hasAny(...SPECIAL_ROLE_IDS);
       if (isSpecialUser) {
-        console.info(
-          `Member ${member.user.username} is special. Not removing roles.`,
-        );
+        console.info(`Member ${username} is special. Not removing roles.`);
+        res
+          .status(200)
+          .send(`Member ${username} is special. Not removing roles.`);
         return;
       }
 
       // Remove all roles from members with no subscription.
-      member.roles.set([]);
+      await member.roles.set([]);
 
       console.info(
         `All roles removed for customer ${customerId} with username ${username}.`,
@@ -83,7 +84,7 @@ export const getCustomersApi = (client: Client) => {
       res
         .status(200)
         .send(
-          `All roles removed from customer ${customerId} with username ${username}`,
+          `All roles removed from customer ${customerId} with username ${username}.`,
         );
       return;
     }
@@ -109,15 +110,10 @@ export const getCustomersApi = (client: Client) => {
         `Customer ${customerId} granted ${discordRole.name} role for sku ${sku}.`,
       );
     } catch (ex) {
-      console.error(
-        'Env ROLE_BY_SKU contains invalid role ID for sku ${sku}',
-        ex,
-      );
+      console.error('Role cannot be assigned.', ex);
       res
         .status(500)
-        .send(
-          'Role cannot be assigned: unknown error. ' + (ex as Error).toString(),
-        );
+        .send('Role cannot be assigned. ' + (ex as Error).toString());
       return;
     }
 

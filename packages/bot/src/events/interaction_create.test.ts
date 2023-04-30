@@ -1,10 +1,15 @@
-import { it, jest } from '@jest/globals';
-import { ChatInputCommandInteraction } from 'discord.js';
-import { describe } from 'node:test';
+import { describe, it, jest } from '@jest/globals';
+import { ChatInputCommandInteraction, Events } from 'discord.js';
 import interactionCreate from './interaction_create.js';
 
 describe('interactionCreate', () => {
+  it('matches the correct event', () => {
+    expect(interactionCreate.name).toEqual(Events.InteractionCreate);
+    expect(interactionCreate.once).toBeFalsy();
+  });
+
   it('invokes command if found', async () => {
+    // Arrage
     const command = {
       execute: jest.fn(),
     };
@@ -16,12 +21,15 @@ describe('interactionCreate', () => {
       },
     } as unknown as ChatInputCommandInteraction;
 
+    // Act
     interactionCreate.execute(interaction);
 
+    // Assert
     expect(command.execute).toHaveBeenCalledWith(interaction);
   });
 
   it('does not invoke command if mismatched', async () => {
+    // Arrange
     const command = {
       execute: jest.fn(),
     };
@@ -33,8 +41,10 @@ describe('interactionCreate', () => {
       },
     } as unknown as ChatInputCommandInteraction;
 
+    // Act
     interactionCreate.execute(interaction);
 
+    // Assert
     expect(command.execute).not.toHaveBeenCalled();
   });
 });

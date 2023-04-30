@@ -1,7 +1,7 @@
 import {
   ActionRowBuilder,
   APIActionRowComponent,
-  APIMessageActionRowComponent,
+  APIButtonComponent,
   ButtonBuilder,
   ButtonStyle,
   ChatInputCommandInteraction,
@@ -23,14 +23,12 @@ const command: SlashCommand = {
 
     await interaction.reply({
       content: VERIFY_MESSAGE,
-      components: [
-        row as unknown as APIActionRowComponent<APIMessageActionRowComponent>,
-      ],
+      components: [row as unknown as APIActionRowComponent<APIButtonComponent>],
     });
   },
 };
 
-const VERIFY_MESSAGE = `>>> *Verify membership*
+export const VERIFY_MESSAGE = `>>> *Verify membership*
      
 In order to receive your role, please login to your account at 
 [morganlatimer.com](https://morganlatimer.com) and copy the code from the Downloads
