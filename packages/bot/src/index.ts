@@ -43,13 +43,13 @@ const eventFiles = fs
 
 for (const file of eventFiles) {
   const filePath = path.join(eventsPath, file);
-  console.log(`Adding event ${file}`);
   const event = (await import(filePath)).default as BotEvent;
   if (event.once) {
     client.once(event.name, (...args) => event.execute(...args));
   } else {
     client.on(event.name, (...args) => event.execute(...args));
   }
+  console.log(`Adding event ${file} listening to ${event.name}`);
 }
 
 client.login(process.env.DISCORD_BOT_TOKEN);
