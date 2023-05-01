@@ -12,13 +12,17 @@ const event: BotEvent = {
     const beforeUsername = before.user.username;
     const afterUsername = after.user.username;
 
+    console.info(`Checking username change for ${afterUsername}.`);
+
     // Ignore non-username changes.
     if (beforeUsername === afterUsername) {
+      console.info(`Username not changed.`);
       return;
     }
 
     // Ignore bot username changes.
     if (before.client.user.username === beforeUsername) {
+      console.info(`Ignoring user changes for bot.`);
       return;
     }
 
