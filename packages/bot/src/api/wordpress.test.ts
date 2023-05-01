@@ -106,14 +106,14 @@ describe('wordpress', () => {
     expect(subscriptions$).rejects.toEqual(new Error());
   });
 
-  it('getActiveSubscriptionsByUserId', async () => {
+  it('getAllSubscriptionsByUserId', async () => {
     // Arrange
     mockFetch.mockResolvedValue(
       new Response(JSON.stringify([TEST_SUBSCRIPTION])),
     );
 
     // Act
-    const subscriptions = await wordpress.getActiveSubscriptionsByUserId(
+    const subscriptions = await wordpress.getAllSubscriptionsByUserId(
       '23452436',
     );
 
@@ -140,12 +140,12 @@ describe('wordpress', () => {
     );
   });
 
-  it('getActiveSubscriptionsByUserId throws', async () => {
+  it('getAllSubscriptionsByUserId throws', async () => {
     // Arrange
     mockFetch.mockRejectedValue(new Error());
 
     // Act
-    const subscriptions$ = wordpress.getActiveSubscriptionsByUserId('23452436');
+    const subscriptions$ = wordpress.getAllSubscriptionsByUserId('23452436');
 
     // Assert
     expect(subscriptions$).rejects.toEqual(new Error());

@@ -54,7 +54,7 @@ export async function getActiveSubscriptionsByCustomerId(
   }
 }
 
-export async function getActiveSubscriptionsByUserId(
+export async function getAllSubscriptionsByUserId(
   userId: string,
 ): Promise<Array<Subscription>> {
   console.info(`Fetching all subscriptions for userId ${userId}.`);

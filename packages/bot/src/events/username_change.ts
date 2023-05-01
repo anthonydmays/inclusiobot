@@ -1,6 +1,6 @@
 import { Events, Presence } from 'discord.js';
 import {
-  getActiveSubscriptionsByUserId,
+  getAllSubscriptionsByUserId,
   updateSubscriptionsCommunityUser,
 } from '../api/wordpress.js';
 import { BotEvent } from '../types.js';
@@ -17,7 +17,7 @@ const event: BotEvent = {
 
     console.info(`Checking username change for ${username} (${userId}).`);
 
-    const subscriptions = await getActiveSubscriptionsByUserId(userId);
+    const subscriptions = await getAllSubscriptionsByUserId(userId);
 
     if (!subscriptions.length) {
       console.warn(`No subscriptions found for ${username}.`);
@@ -27,10 +27,10 @@ const event: BotEvent = {
     const subscriptionToUpdate = subscriptions.filter(
       (s) => s.username !== username,
     );
-    const subscriptionIds = subscriptions.map((s) => s.id);
+    const subscriptionIds = subscriptionToUpdate.map((s) => s.id);
 
     // Ignore non-username changes.
-    if (!subscriptionIds.length) {
+    if (!subscriptionToUpdate.length) {
       console.info(`Username not changed.`);
       return;
     }
