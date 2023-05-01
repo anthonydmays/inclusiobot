@@ -16,3 +16,12 @@ export const ROLE_BY_SKU: Record<string, string> = Object.fromEntries(
  */
 export const SPECIAL_ROLE_IDS: readonly string[] =
   process.env.SPECIAL_ROLE_IDS?.split(',') || [];
+
+export interface Subscription {
+  id: number;
+  name?: string;
+  sku?: string;
+  customerId?: number;
+  username?: string;
+  userId?: string;
+}

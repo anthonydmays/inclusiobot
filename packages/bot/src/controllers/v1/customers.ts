@@ -4,7 +4,7 @@ import {
   getActiveSubscriptionsByCustomerId,
   getUserIdBySubscriptionId,
 } from '../../api/wordpress.js';
-import { ROLE_BY_SKU, SPECIAL_ROLE_IDS } from '../../constants.js';
+import { ROLE_BY_SKU, SPECIAL_ROLE_IDS } from '../../models.js';
 
 export const getCustomersApi = (client: Client) => {
   const router = express.Router();
@@ -18,16 +18,12 @@ export const getCustomersApi = (client: Client) => {
 
     // Pick the highest SKU level
     const maxSubscription = subscriptions.length
-      ? subscriptions.reduce((max, s) =>
-          s.mlc_subscription_sku > max.mlc_subscription_sku ? s : max,
-        )
+      ? subscriptions.reduce((max, s) => (s.sku > max.sku ? s : max))
       : undefined;
 
     // Get community id and sku from subscription
-    const sku = maxSubscription?.mlc_subscription_sku;
-    let userId = maxSubscription?.meta_data.find(
-      (m) => m.key === 'mlc_community_user_id',
-    )?.value;
+    const sku = maxSubscription?.sku;
+    let userId = maxSubscription?.userId;
 
     // If there are no active subscriptions, then use the provided subscription ID to pull a userId.
     if (!userId && req.body?.subscriptionId) {

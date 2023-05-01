@@ -3,7 +3,7 @@ import {
   getActiveSubscriptionsByKey,
   updateSubscriptionsCommunityUser,
 } from '../api/wordpress.js';
-import { ROLE_BY_SKU } from '../constants.js';
+import { ROLE_BY_SKU } from '../models.js';
 import { BotEvent } from '../types.js';
 
 const event: BotEvent = {
@@ -32,8 +32,8 @@ const event: BotEvent = {
 
     const subcription = subscriptions[0];
     const subscriptionId = subcription.id;
-    const subscriptionName = subcription.mlc_subscription_name;
-    const subcriptionSku = subcription.mlc_subscription_sku;
+    const subscriptionName = subcription.name;
+    const subcriptionSku = subcription.sku;
 
     await updateSubscriptionsCommunityUser([subscriptionId], {
       userId: interaction.user.id,

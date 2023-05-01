@@ -1,5 +1,5 @@
 import { describe, it, jest } from '@jest/globals';
-import { WpSubscription } from './types.js';
+import { WpSubscription } from './api_models.js';
 
 const mockFetch = jest.fn<typeof fetch>();
 jest.unstable_mockModule('node-fetch', () => ({
@@ -37,9 +37,9 @@ describe('wordpress', () => {
     const subscriptions = await wordpress.getActiveSubscriptionsByKey('1234');
 
     // Assert
-    expect(subscriptions).toEqual([TEST_SUBSCRIPTION]);
+    expect(subscriptions).toEqual([TEST_SUBSCRIPTION_RESULT]);
     expect(mockFetch).toHaveBeenCalledWith(
-      'https://wp.com/wp-json/mlc/v1/subscriptions?key=1234&_fields=id,customer_id,meta_data,mlc_subscription_sku,mlc_subscription_name',
+      'https://wp.com/wp-json/mlc/v1/subscriptions?key=1234&_fields=id,mlc_subscription_sku,mlc_subscription_name,customer_id,mlc_community_user_id,mlc_community_username',
       {
         headers: {
           Authorization: 'Basic YWJjMTIz',
@@ -73,9 +73,18 @@ describe('wordpress', () => {
     );
 
     // Assert
-    expect(subscriptions).toEqual([TEST_SUBSCRIPTION]);
+    expect(subscriptions).toEqual([
+      {
+        id: TEST_SUBSCRIPTION.id,
+        sku: TEST_SUBSCRIPTION.mlc_subscription_sku,
+        name: TEST_SUBSCRIPTION.mlc_subscription_name,
+        customerId: TEST_SUBSCRIPTION.customer_id,
+        userId: TEST_SUBSCRIPTION.mlc_community_user_id,
+        username: TEST_SUBSCRIPTION.mlc_community_username,
+      },
+    ]);
     expect(mockFetch).toHaveBeenCalledWith(
-      'https://wp.com/wp-json/mlc/v1/subscriptions?customer_id=5678&_fields=id,customer_id,meta_data,mlc_subscription_sku,mlc_subscription_name',
+      'https://wp.com/wp-json/mlc/v1/subscriptions?customer_id=5678&_fields=id,mlc_subscription_sku,mlc_subscription_name,customer_id,mlc_community_user_id,mlc_community_username',
       {
         headers: {
           Authorization: 'Basic YWJjMTIz',
@@ -97,6 +106,51 @@ describe('wordpress', () => {
     expect(subscriptions$).rejects.toEqual(new Error());
   });
 
+  it('getActiveSubscriptionsByUserId', async () => {
+    // Arrange
+    mockFetch.mockResolvedValue(
+      new Response(JSON.stringify([TEST_SUBSCRIPTION])),
+    );
+
+    // Act
+    const subscriptions = await wordpress.getActiveSubscriptionsByUserId(
+      '23452436',
+    );
+
+    // Assert
+    expect(subscriptions).toEqual([
+      {
+        id: TEST_SUBSCRIPTION.id,
+        sku: TEST_SUBSCRIPTION.mlc_subscription_sku,
+        name: TEST_SUBSCRIPTION.mlc_subscription_name,
+        customerId: TEST_SUBSCRIPTION.customer_id,
+        userId: TEST_SUBSCRIPTION.mlc_community_user_id,
+        username: TEST_SUBSCRIPTION.mlc_community_username,
+      },
+    ]);
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://wp.com/wp-json/mlc/v1/subscriptions?active=false&mlc_community_user_id=23452436&_fields=id,mlc_subscription_sku,mlc_subscription_name,customer_id,mlc_community_user_id,mlc_community_username',
+      {
+        headers: {
+          Authorization: 'Basic YWJjMTIz',
+          'Content-Type': 'application/json',
+        },
+        method: 'GET',
+      },
+    );
+  });
+
+  it('getActiveSubscriptionsByUserId throws', async () => {
+    // Arrange
+    mockFetch.mockRejectedValue(new Error());
+
+    // Act
+    const subscriptions$ = wordpress.getActiveSubscriptionsByUserId('23452436');
+
+    // Assert
+    expect(subscriptions$).rejects.toEqual(new Error());
+  });
+
   it('getSubscriptionIdsByUsername', async () => {
     // Arrange
     mockFetch.mockResolvedValue(
@@ -109,7 +163,7 @@ describe('wordpress', () => {
     // Assert
     expect(subscriptions).toEqual([1234]);
     expect(mockFetch).toHaveBeenCalledWith(
-      'https://wp.com/wp-json/mlc/v1/subscriptions?mlc_community_user_id=2341256&_fields=id',
+      'https://wp.com/wp-json/mlc/v1/subscriptions?active=false&mlc_community_user_id=2341256&_fields=id',
       {
         headers: {
           Authorization: 'Basic YWJjMTIz',
@@ -209,8 +263,17 @@ describe('wordpress', () => {
 
 const TEST_SUBSCRIPTION: WpSubscription = {
   id: 1234,
+  customer_id: 567,
   mlc_community_user_id: 'testuser',
   mlc_subscription_sku: '5678',
   mlc_subscription_name: 'Test subscription',
-  meta_data: [],
+};
+
+const TEST_SUBSCRIPTION_RESULT = {
+  id: TEST_SUBSCRIPTION.id,
+  sku: TEST_SUBSCRIPTION.mlc_subscription_sku,
+  name: TEST_SUBSCRIPTION.mlc_subscription_name,
+  customerId: TEST_SUBSCRIPTION.customer_id,
+  userId: TEST_SUBSCRIPTION.mlc_community_user_id,
+  username: TEST_SUBSCRIPTION.mlc_community_username,
 };

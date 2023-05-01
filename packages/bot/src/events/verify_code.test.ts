@@ -1,12 +1,12 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { Events, ModalSubmitInteraction } from 'discord.js';
-import { WpSubscription } from '../api/types.js';
+import { Subscription } from '../models.js';
 
 jest.unstable_mockModule('../api/wordpress.js', () => ({
   getActiveSubscriptionsByKey: jest.fn(),
   updateSubscriptionsCommunityUser: jest.fn(),
 }));
-jest.unstable_mockModule('../constants.js', () => ({
+jest.unstable_mockModule('../models.js', () => ({
   ROLE_BY_SKU: {
     '789': '456789',
   },
@@ -105,9 +105,11 @@ describe('verifyCode', () => {
     mockGetActiveSubs.mockResolvedValue([
       {
         id: 123,
-        mlc_subscription_name: 'Pro Subscription',
-        mlc_subscription_sku: '789',
-      } as WpSubscription,
+        name: 'Pro Subscription',
+        sku: '789',
+        userId: '231241512',
+        username: 'testuser',
+      } as Subscription,
     ]);
     const mockUpdateSub = jest.mocked(updateSubscriptionsCommunityUser);
 
@@ -157,7 +159,7 @@ describe('verifyCode', () => {
         id: 123,
         mlc_subscription_name: 'Pro Subscription',
         mlc_subscription_sku: '777',
-      } as WpSubscription,
+      } as Subscription,
     ]);
 
     // Act

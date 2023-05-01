@@ -3,13 +3,13 @@ import bodyParser from 'body-parser';
 import { Client, Collection, Guild, GuildMember, Role } from 'discord.js';
 import express, { Application } from 'express';
 import request from 'supertest';
-import { WpSubscription } from '../../api/types.js';
+import { Subscription } from '../../models.js';
 
 jest.unstable_mockModule('../../api/wordpress.js', () => ({
   getActiveSubscriptionsByCustomerId: jest.fn(),
   getUserIdBySubscriptionId: jest.fn(),
 }));
-jest.unstable_mockModule('../../constants.js', () => ({
+jest.unstable_mockModule('../../models.js', () => ({
   ROLE_BY_SKU: {
     SKU5: 'role213',
   },
@@ -327,27 +327,24 @@ describe('customers', () => {
   });
 });
 
-const TEST_SUBSCRIPTIONS: WpSubscription[] = [
+const TEST_SUBSCRIPTIONS: Subscription[] = [
   {
     id: 567,
-    mlc_subscription_sku: 'SKU1',
-    mlc_subscription_name: 'name2',
-    mlc_community_user_id: 'userid3',
-    meta_data: [{ id: 8, key: 'mlc_community_user_id', value: 'userid7' }],
+    sku: 'SKU1',
+    name: 'name2',
+    userId: 'userid7',
   },
   {
     id: 234,
-    mlc_subscription_sku: 'SKU4',
-    mlc_subscription_name: 'name5',
-    mlc_community_user_id: 'userid6',
-    meta_data: [{ id: 9, key: 'mlc_community_user_id', value: 'userid8' }],
+    sku: 'SKU4',
+    name: 'name5',
+    userId: 'userid8',
   },
 ];
 
-const TEST_SUBSCRIPTION_SKU5: WpSubscription = {
+const TEST_SUBSCRIPTION_SKU5: Subscription = {
   id: 234,
-  mlc_subscription_sku: 'SKU5',
-  mlc_subscription_name: 'name5',
-  mlc_community_user_id: 'userid6',
-  meta_data: [{ id: 9, key: 'mlc_community_user_id', value: 'userid8' }],
+  sku: 'SKU5',
+  name: 'name5',
+  userId: 'userid8',
 };

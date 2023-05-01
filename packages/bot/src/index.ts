@@ -8,7 +8,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'url';
 import { getApi } from './controllers/v1/api.js';
-import { BotEvent, SlashCommand } from './types.js';
+import { SlashCommand } from './SlashCommand.js';
+import { BotEvent } from './types.js';
 
 dotenv.config();
 

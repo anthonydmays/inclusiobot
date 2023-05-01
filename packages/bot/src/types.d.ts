@@ -1,8 +1,5 @@
-import {
-  ChatInputCommandInteraction,
-  Collection,
-  SlashCommandBuilder,
-} from 'discord.js';
+import { Collection } from 'discord.js';
+import { SlashCommand } from './SlashCommand.js';
 
 declare global {
   namespace NodeJS {
@@ -17,11 +14,6 @@ declare global {
       DISABLE_SERVER_FOR_TESTS: string;
     }
   }
-}
-
-export interface SlashCommand {
-  data: SlashCommandBuilder;
-  execute: (interaction: ChatInputCommandInteraction) => void;
 }
 
 export interface BotEvent {
