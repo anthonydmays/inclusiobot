@@ -5,6 +5,7 @@ import {
 } from '../api/wordpress.js';
 import { BotEvent } from '../types.js';
 
+// TODO(anthonydmays): Troubleshoot why this isn't working.
 const event: BotEvent = {
   name: Events.GuildMemberUpdate,
   execute: async (before: GuildMember, after: GuildMember) => {
