@@ -40,14 +40,21 @@ const event: BotEvent = {
       username: interaction.user.username,
     });
 
-    await setUserRoleBySku(interaction, subcriptionSku);
+    try {
+      await setUserRoleBySku(interaction, subcriptionSku);
 
-    await interaction.followUp({
-      content: `Your subscription to **${subscriptionName}** was verified successfully!`,
-    });
-    console.info(
-      `Subscription for ${interaction.user.username} verified via subscription ${subscriptionId}, sku ${subcriptionSku}.`,
-    );
+      await interaction.followUp({
+        content: `Your subscription to **${subscriptionName}** was verified successfully!`,
+      });
+      console.info(
+        `Subscription for ${interaction.user.username} verified via subscription ${subscriptionId}, sku ${subcriptionSku}.`,
+      );
+    } catch (ex) {
+      await interaction.followUp({
+        content: `Your subscription was verified but something went wrong. Please contact support or email support@morganlatimer.com.`,
+      });
+      console.info(`Subscription for ${interaction.user.username} failed.`, ex);
+    }
   },
 };
 
