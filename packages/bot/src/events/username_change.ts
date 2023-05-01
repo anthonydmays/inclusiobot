@@ -11,7 +11,7 @@ const event: BotEvent = {
     const { username, id: userId } = after.user;
 
     // If the user had a previous status then, they've just awaken. Ignore.
-    if (before) {
+    if (after.status !== 'online') {
       return;
     }
 
@@ -28,7 +28,6 @@ const event: BotEvent = {
       (s) => s.username !== username,
     );
     const subscriptionIds = subscriptions.map((s) => s.id);
-    const beforeUsername = subscriptionToUpdate[0].username || 'N/A';
 
     // Ignore non-username changes.
     if (!subscriptionIds.length) {
@@ -36,6 +35,7 @@ const event: BotEvent = {
       return;
     }
 
+    const beforeUsername = subscriptionToUpdate[0].username || 'N/A';
     console.info(
       `Changing subscription username from ${beforeUsername} to ${username}`,
     );
