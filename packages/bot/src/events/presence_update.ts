@@ -11,6 +11,11 @@ const event: BotEvent = {
   execute: async (before: Presence, after: Presence) => {
     const { tag, id: userId } = after.user;
 
+    // Ignore the bot.
+    if (after.user.id == after.client.user.id) {
+      return;
+    }
+
     // If the user had a previous status then, they've just awaken. Ignore.
     if (after.status !== 'online' && after.status !== 'offline') {
       return;
