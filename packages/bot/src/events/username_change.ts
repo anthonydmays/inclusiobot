@@ -11,7 +11,7 @@ const event: BotEvent = {
     const { username, id: userId } = after.user;
 
     // If the user had a previous status then, they've just awaken. Ignore.
-    if (after.status !== 'online') {
+    if (after.status !== 'online' && after.status !== 'offline') {
       return;
     }
 
