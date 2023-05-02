@@ -11,8 +11,8 @@ const event: BotEvent = {
   execute: async (before: Presence, after: Presence) => {
     const { tag, id: userId } = after.user;
 
-    // Ignore the bot.
-    if (after.user.id == after.client.user.id) {
+    // Ignore bots.
+    if (after.user.bot) {
       return;
     }
 
