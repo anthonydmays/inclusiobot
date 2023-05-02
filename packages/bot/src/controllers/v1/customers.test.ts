@@ -333,12 +333,14 @@ const TEST_SUBSCRIPTIONS: Subscription[] = [
     sku: 'SKU1',
     name: 'name2',
     userId: 'userid7',
+    active: true,
   },
   {
     id: 234,
     sku: 'SKU4',
     name: 'name5',
     userId: 'userid8',
+    active: true,
   },
 ];
 
@@ -347,4 +349,5 @@ const TEST_SUBSCRIPTION_SKU5: Subscription = {
   sku: 'SKU5',
   name: 'name5',
   userId: 'userid8',
+  active: true,
 };

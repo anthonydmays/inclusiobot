@@ -59,7 +59,7 @@ export async function getAllSubscriptionsByUserId(
 ): Promise<Array<Subscription>> {
   console.info(`Fetching all subscriptions for userId ${userId}.`);
   const endpoint = `${process.env.WP_API_HOST}/wp-json/mlc/v1/subscriptions`;
-  const url = `${endpoint}?active=false&mlc_community_user_id=${userId}&_fields=${API_FIELDS}`;
+  const url = `${endpoint}?active_only=false&mlc_community_user_id=${userId}&_fields=${API_FIELDS}`;
   try {
     const res = ((await (
       await fetch(url, {
@@ -88,8 +88,9 @@ function mapApiToSubscription(apiSubscription: WpSubscription): Subscription {
     customer_id: customerId,
     mlc_community_user_id: userId,
     mlc_community_username: username,
+    mlc_subscription_active: active,
   } = apiSubscription;
-  return { id, name, sku, customerId, userId, username };
+  return { id, name, sku, customerId, userId, username, active: !!active };
 }
 
 export async function getUserIdBySubscriptionId(
@@ -123,7 +124,7 @@ export async function getSubscriptionIdsByUserId(
 ): Promise<number[]> {
   console.info(`Fetching subscriptions with userId ${userId}.`);
   const endpoint = `${process.env.WP_API_HOST}/wp-json/mlc/v1/subscriptions`;
-  const url = `${endpoint}?active=false&mlc_community_user_id=${userId}&_fields=id`;
+  const url = `${endpoint}?active_only=false&mlc_community_user_id=${userId}&_fields=id`;
   try {
     const res = (await (
       await fetch(url, {
@@ -180,4 +181,4 @@ export async function updateSubscriptionsCommunityUser(
 }
 
 const API_FIELDS =
-  'id,mlc_subscription_sku,mlc_subscription_name,customer_id,mlc_community_user_id,mlc_community_username';
+  'id,mlc_subscription_sku,mlc_subscription_name,customer_id,mlc_community_user_id,mlc_community_username,mlc_subscription_active';

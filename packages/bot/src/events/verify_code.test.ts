@@ -88,7 +88,7 @@ describe('verifyCode', () => {
       customId: 'subscriptionKeyModal',
       user: {
         id: '231241512',
-        username: 'testuser',
+        tag: 'testuser#123',
       },
       deferReply: jest.fn(),
       followUp: jest.fn(),
@@ -108,7 +108,8 @@ describe('verifyCode', () => {
         name: 'Pro Subscription',
         sku: '789',
         userId: '231241512',
-        username: 'testuser',
+        username: 'testuser#123',
+        active: true,
       } as Subscription,
     ]);
     const mockUpdateSub = jest.mocked(updateSubscriptionsCommunityUser);
@@ -120,7 +121,7 @@ describe('verifyCode', () => {
     expect(mockGetActiveSubs).toHaveBeenCalledWith('blah');
     expect(mockUpdateSub).toHaveBeenCalledWith([123], {
       userId: '231241512',
-      username: 'testuser',
+      username: 'testuser#123',
     });
     expect(interaction.guild?.members.addRole).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -134,13 +135,14 @@ describe('verifyCode', () => {
     });
   });
 
-  it('does not update role when missing', async () => {
+  it('updates the subscription and user roles', async () => {
     // Arrange
     const interaction = {
       isModalSubmit: jest.fn().mockReturnValue(true),
       customId: 'subscriptionKeyModal',
       user: {
-        username: 'testuser',
+        id: '231241512',
+        tag: 'testuser#123',
       },
       deferReply: jest.fn(),
       followUp: jest.fn(),
@@ -157,8 +159,53 @@ describe('verifyCode', () => {
     mockGetActiveSubs.mockResolvedValue([
       {
         id: 123,
-        mlc_subscription_name: 'Pro Subscription',
-        mlc_subscription_sku: '777',
+        name: 'Pro Subscription',
+        sku: '789',
+        userId: '231241512',
+        username: 'testuser#123',
+        active: true,
+      } as Subscription,
+    ]);
+    const mockUpdateSub = jest.mocked(updateSubscriptionsCommunityUser);
+    const mockAddRole = jest.mocked(interaction.guild!.members.addRole);
+    mockAddRole.mockRejectedValue(new Error());
+
+    // Act
+    await verifyCode.execute(interaction);
+
+    // Assert
+    expect(interaction.followUp).toHaveBeenCalledWith({
+      content:
+        'Your subscription was verified but something went wrong. Please contact support or email support@morganlatimer.com.',
+    });
+  });
+
+  it('does not update role when missing', async () => {
+    // Arrange
+    const interaction = {
+      isModalSubmit: jest.fn().mockReturnValue(true),
+      customId: 'subscriptionKeyModal',
+      user: {
+        tag: 'testuser#123',
+      },
+      deferReply: jest.fn(),
+      followUp: jest.fn(),
+      fields: {
+        getTextInputValue: jest.fn().mockReturnValue('blah'),
+      },
+      guild: {
+        members: {
+          addRole: jest.fn(),
+        },
+      },
+    } as unknown as ModalSubmitInteraction;
+    const mockGetActiveSubs = jest.mocked(getActiveSubscriptionsByKey);
+    mockGetActiveSubs.mockResolvedValue([
+      {
+        id: 123,
+        name: 'Pro Subscription',
+        sku: '777',
+        active: true,
       } as Subscription,
     ]);
 

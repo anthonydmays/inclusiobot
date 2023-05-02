@@ -3,7 +3,7 @@ import {
   getActiveSubscriptionsByKey,
   updateSubscriptionsCommunityUser,
 } from '../api/wordpress.js';
-import { ROLE_BY_SKU } from '../models.js';
+import { ROLE_BY_SKU, Subscription } from '../models.js';
 import { BotEvent } from '../types.js';
 
 const event: BotEvent = {
@@ -12,6 +12,7 @@ const event: BotEvent = {
     if (!interaction.isModalSubmit()) return;
     if (interaction.customId !== 'subscriptionKeyModal') return;
 
+    const tag = interaction.user.tag;
     const subscriptionKey = interaction.fields.getTextInputValue(
       'subscriptionKeyInput',
     );
@@ -21,42 +22,45 @@ const event: BotEvent = {
     const subscriptions = await getActiveSubscriptionsByKey(subscriptionKey);
 
     if (subscriptions.length === 0) {
-      console.warn(
-        `Subscription for ${interaction.user.username} not verified.`,
-      );
+      console.warn(`Subscription for ${tag} not verified.`);
       await interaction.followUp({
         content: `Your subscription **could not** be verified.`,
       });
       return;
     }
 
-    const subcription = subscriptions[0];
-    const subscriptionId = subcription.id;
-    const subscriptionName = subcription.name;
-    const subcriptionSku = subcription.sku;
+    const subscription = subscriptions[0];
 
-    await updateSubscriptionsCommunityUser([subscriptionId], {
+    await updateSubscriptionsCommunityUser([subscription.id], {
       userId: interaction.user.id,
-      username: interaction.user.username,
+      username: tag,
     });
 
-    try {
-      await setUserRoleBySku(interaction, subcriptionSku);
-
-      await interaction.followUp({
-        content: `Your subscription to **${subscriptionName}** was verified successfully!`,
-      });
-      console.info(
-        `Subscription for ${interaction.user.username} verified via subscription ${subscriptionId}, sku ${subcriptionSku}.`,
-      );
-    } catch (ex) {
-      await interaction.followUp({
-        content: `Your subscription was verified but something went wrong. Please contact support or email support@morganlatimer.com.`,
-      });
-      console.info(`Subscription for ${interaction.user.username} failed.`, ex);
-    }
+    await assignRole(interaction, subscription, tag);
   },
 };
+
+async function assignRole(
+  interaction,
+  subscription: Subscription,
+  tag: string,
+) {
+  try {
+    await setUserRoleBySku(interaction, subscription.sku);
+
+    await interaction.followUp({
+      content: `Your subscription to **${subscription.name}** was verified successfully!`,
+    });
+    console.info(
+      `Subscription for ${tag} verified via subscription ${subscription.id}, sku ${subscription.sku}.`,
+    );
+  } catch (ex) {
+    await interaction.followUp({
+      content: `Your subscription was verified but something went wrong. Please contact support or email support@morganlatimer.com.`,
+    });
+    console.info(`Subscription for ${tag} failed.`, ex);
+  }
+}
 
 async function setUserRoleBySku(
   interaction: ModalSubmitInteraction,
@@ -67,7 +71,7 @@ async function setUserRoleBySku(
     return;
   }
 
-  interaction.guild?.members.addRole({
+  await interaction.guild?.members.addRole({
     user: interaction.user,
     role,
   });

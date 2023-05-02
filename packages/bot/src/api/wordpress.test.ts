@@ -39,7 +39,7 @@ describe('wordpress', () => {
     // Assert
     expect(subscriptions).toEqual([TEST_SUBSCRIPTION_RESULT]);
     expect(mockFetch).toHaveBeenCalledWith(
-      'https://wp.com/wp-json/mlc/v1/subscriptions?key=1234&_fields=id,mlc_subscription_sku,mlc_subscription_name,customer_id,mlc_community_user_id,mlc_community_username',
+      'https://wp.com/wp-json/mlc/v1/subscriptions?key=1234&_fields=id,mlc_subscription_sku,mlc_subscription_name,customer_id,mlc_community_user_id,mlc_community_username,mlc_subscription_active',
       {
         headers: {
           Authorization: 'Basic YWJjMTIz',
@@ -81,10 +81,11 @@ describe('wordpress', () => {
         customerId: TEST_SUBSCRIPTION.customer_id,
         userId: TEST_SUBSCRIPTION.mlc_community_user_id,
         username: TEST_SUBSCRIPTION.mlc_community_username,
+        active: TEST_SUBSCRIPTION.mlc_subscription_active,
       },
     ]);
     expect(mockFetch).toHaveBeenCalledWith(
-      'https://wp.com/wp-json/mlc/v1/subscriptions?customer_id=5678&_fields=id,mlc_subscription_sku,mlc_subscription_name,customer_id,mlc_community_user_id,mlc_community_username',
+      'https://wp.com/wp-json/mlc/v1/subscriptions?customer_id=5678&_fields=id,mlc_subscription_sku,mlc_subscription_name,customer_id,mlc_community_user_id,mlc_community_username,mlc_subscription_active',
       {
         headers: {
           Authorization: 'Basic YWJjMTIz',
@@ -126,10 +127,11 @@ describe('wordpress', () => {
         customerId: TEST_SUBSCRIPTION.customer_id,
         userId: TEST_SUBSCRIPTION.mlc_community_user_id,
         username: TEST_SUBSCRIPTION.mlc_community_username,
+        active: TEST_SUBSCRIPTION.mlc_subscription_active,
       },
     ]);
     expect(mockFetch).toHaveBeenCalledWith(
-      'https://wp.com/wp-json/mlc/v1/subscriptions?active=false&mlc_community_user_id=23452436&_fields=id,mlc_subscription_sku,mlc_subscription_name,customer_id,mlc_community_user_id,mlc_community_username',
+      'https://wp.com/wp-json/mlc/v1/subscriptions?active_only=false&mlc_community_user_id=23452436&_fields=id,mlc_subscription_sku,mlc_subscription_name,customer_id,mlc_community_user_id,mlc_community_username,mlc_subscription_active',
       {
         headers: {
           Authorization: 'Basic YWJjMTIz',
@@ -163,7 +165,7 @@ describe('wordpress', () => {
     // Assert
     expect(subscriptions).toEqual([1234]);
     expect(mockFetch).toHaveBeenCalledWith(
-      'https://wp.com/wp-json/mlc/v1/subscriptions?active=false&mlc_community_user_id=2341256&_fields=id',
+      'https://wp.com/wp-json/mlc/v1/subscriptions?active_only=false&mlc_community_user_id=2341256&_fields=id',
       {
         headers: {
           Authorization: 'Basic YWJjMTIz',
@@ -267,6 +269,7 @@ const TEST_SUBSCRIPTION: WpSubscription = {
   mlc_community_user_id: 'testuser',
   mlc_subscription_sku: '5678',
   mlc_subscription_name: 'Test subscription',
+  mlc_subscription_active: true,
 };
 
 const TEST_SUBSCRIPTION_RESULT = {
@@ -276,4 +279,5 @@ const TEST_SUBSCRIPTION_RESULT = {
   customerId: TEST_SUBSCRIPTION.customer_id,
   userId: TEST_SUBSCRIPTION.mlc_community_user_id,
   username: TEST_SUBSCRIPTION.mlc_community_username,
+  active: TEST_SUBSCRIPTION.mlc_subscription_active,
 };

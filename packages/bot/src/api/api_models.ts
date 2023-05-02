@@ -5,6 +5,7 @@ export declare interface WpSubscription {
   mlc_community_username?: string;
   mlc_subscription_sku?: string;
   mlc_subscription_name?: string;
+  mlc_subscription_active?: boolean;
 }
 
 export declare interface WpMetadata {

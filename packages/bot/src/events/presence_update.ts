@@ -3,29 +3,39 @@ import {
   getAllSubscriptionsByUserId,
   updateSubscriptionsCommunityUser,
 } from '../api/wordpress.js';
+import { SPECIAL_ROLE_IDS } from '../models.js';
 import { BotEvent } from '../types.js';
 
 const event: BotEvent = {
   name: Events.PresenceUpdate,
   execute: async (before: Presence, after: Presence) => {
-    const { username, id: userId } = after.user;
+    const { tag, id: userId } = after.user;
 
     // If the user had a previous status then, they've just awaken. Ignore.
     if (after.status !== 'online' && after.status !== 'offline') {
       return;
     }
 
-    console.info(`Checking username change for ${username} (${userId}).`);
+    console.info(`Checking username change for ${tag} (${userId}).`);
 
     const subscriptions = await getAllSubscriptionsByUserId(userId);
 
+    if (!subscriptions.some((s) => s.active)) {
+      if (!after.member.roles.cache.find((r) => SPECIAL_ROLE_IDS.has(r.id))) {
+        after.member.roles.set([]);
+
+        console.info(`All roles removed for user ${tag} (${userId}).`);
+        return;
+      }
+    }
+
     if (!subscriptions.length) {
-      console.warn(`No subscriptions found for ${username}.`);
+      console.warn(`No subscriptions found for ${tag}.`);
       return;
     }
 
     const subscriptionToUpdate = subscriptions.filter(
-      (s) => s.username !== username,
+      (s) => s.username !== tag,
     );
     const subscriptionIds = subscriptionToUpdate.map((s) => s.id);
 
@@ -35,24 +45,22 @@ const event: BotEvent = {
       return;
     }
 
-    const beforeUsername = subscriptionToUpdate[0].username || 'N/A';
-    console.info(
-      `Changing subscription username from ${beforeUsername} to ${username}`,
-    );
+    const beforeTag = subscriptionToUpdate[0].username || 'N/A';
+    console.info(`Changing subscription username from ${beforeTag} to ${tag}`);
 
     try {
       await updateSubscriptionsCommunityUser(subscriptionIds, {
-        userId: after.user.id,
-        username: after.user.username,
+        userId,
+        username: tag,
       });
 
       console.info(
-        `Username changed from ${beforeUsername} to ${username} for subscriptions`,
+        `Username changed from ${beforeTag} to ${tag} for subscriptions`,
         subscriptionIds,
       );
     } catch (ex) {
       console.info(
-        `Failed to update subscriptions for ${username}.`,
+        `Failed to update subscriptions for ${tag}.`,
         subscriptionIds,
       );
     }
