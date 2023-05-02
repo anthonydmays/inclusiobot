@@ -29,6 +29,14 @@ const event: BotEvent = {
       return;
     }
 
+    if (subscriptions.length > 0) {
+      const ids = subscriptions.map((s) => s.id);
+      console.warn(
+        `Multiple subscriptions (${ids}) were found for key ${key}.`,
+      );
+    }
+
+    // We can generally assume that there will only be one active subscription per key.
     const subscription = subscriptions[0];
 
     if (subscription.userId && subscription.userId !== userId) {
