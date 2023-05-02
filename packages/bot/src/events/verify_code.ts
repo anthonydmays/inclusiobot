@@ -12,27 +12,41 @@ const event: BotEvent = {
     if (!interaction.isModalSubmit()) return;
     if (interaction.customId !== 'subscriptionKeyModal') return;
 
-    const tag = interaction.user.tag;
-    const subscriptionKey = interaction.fields.getTextInputValue(
-      'subscriptionKeyInput',
-    );
+    const { tag, id: userId } = interaction.user;
+    const key = interaction.fields.getTextInputValue('subscriptionKeyInput');
 
     await interaction.deferReply({ ephemeral: true });
 
-    const subscriptions = await getActiveSubscriptionsByKey(subscriptionKey);
+    const subscriptions = await getActiveSubscriptionsByKey(key);
 
     if (subscriptions.length === 0) {
-      console.warn(`Subscription for ${tag} not verified.`);
+      console.warn(
+        `No active subscriptions for ${key} entered by ${tag} (${userId}).`,
+      );
       await interaction.followUp({
-        content: `Your subscription **could not** be verified.`,
+        content: `**No subscription found.** Please contact support@morganlatimer.com for assistance.`,
       });
       return;
     }
 
     const subscription = subscriptions[0];
 
+    if (subscription.userId && subscription.userId !== userId) {
+      await interaction.followUp({
+        content: `Key **already verified** by another user. Please contact support@morganlatimer.com for assistance.`,
+      });
+      console.warn(
+        `Verification denied for username ${tag} with subscription key ${key}: Already verified by ${subscription.username} (${subscription.userId}).`,
+      );
+      return;
+    }
+
+    console.info(
+      `Found unverified subscription ${subscription.id} for key ${key}.`,
+    );
+
     await updateSubscriptionsCommunityUser([subscription.id], {
-      userId: interaction.user.id,
+      userId,
       username: tag,
     });
 
@@ -52,7 +66,7 @@ async function assignRole(
       content: `Your subscription to **${subscription.name}** was verified successfully!`,
     });
     console.info(
-      `Subscription for ${tag} verified via subscription ${subscription.id}, sku ${subscription.sku}.`,
+      `Subscription for ${tag} verified via subscription ${subscription.id}, sku ${subscription.sku} (${subscription.name}).`,
     );
   } catch (ex) {
     await interaction.followUp({

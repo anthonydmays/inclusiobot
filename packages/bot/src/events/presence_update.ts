@@ -22,7 +22,7 @@ const event: BotEvent = {
 
     if (!subscriptions.some((s) => s.active)) {
       if (!after.member.roles.cache.find((r) => SPECIAL_ROLE_IDS.has(r.id))) {
-        after.member.roles.set([]);
+        await after.member.roles.set([]);
 
         console.info(`All roles removed for user ${tag} (${userId}).`);
         return;
