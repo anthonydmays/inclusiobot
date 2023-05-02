@@ -1,6 +1,6 @@
 import { createTerminus } from '@godaddy/terminus';
 import bodyParser from 'body-parser';
-import { Client, Collection, GatewayIntentBits } from 'discord.js';
+import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
 import * as dotenv from 'dotenv';
 import express from 'express';
 import { createServer } from 'http';
@@ -52,6 +52,10 @@ for (const file of eventFiles) {
   }
   console.log(`Adding event ${file} listening to ${event.name}`);
 }
+
+client.on(Events.Error, (error) => {
+  console.error('Encountered API error:', error);
+});
 
 client.login(process.env.DISCORD_BOT_TOKEN);
 
