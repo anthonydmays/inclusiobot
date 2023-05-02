@@ -3,6 +3,10 @@ import { ChatInputCommandInteraction, Events } from 'discord.js';
 import interactionCreate from './interaction_create.js';
 
 describe('interactionCreate', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('matches the correct event', () => {
     expect(interactionCreate.name).toEqual(Events.InteractionCreate);
     expect(interactionCreate.once).toBeFalsy();

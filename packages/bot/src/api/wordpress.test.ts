@@ -20,7 +20,7 @@ describe('wordpress', () => {
   });
 
   beforeEach(() => {
-    mockFetch.mockReset();
+    jest.resetAllMocks();
   });
 
   afterAll(() => {

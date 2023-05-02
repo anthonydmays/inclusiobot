@@ -19,6 +19,10 @@ const {
 const verifyCode = (await import('./verify_code.js')).default;
 
 describe('verifyCode', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   it('listens to the correct event', async () => {
     expect(verifyCode.name).toEqual(Events.InteractionCreate);
   });
@@ -77,7 +81,8 @@ describe('verifyCode', () => {
     expect(interaction.deferReply).toHaveBeenCalledWith({ ephemeral: true });
     expect(mockGetActiveSubs).toHaveBeenCalledWith('blah');
     expect(interaction.followUp).toHaveBeenCalledWith({
-      content: 'Your subscription **could not** be verified.',
+      content:
+        '**No subscription found.** Please contact support@morganlatimer.com for assistance.',
     });
   });
 
@@ -135,7 +140,53 @@ describe('verifyCode', () => {
     });
   });
 
-  it('updates the subscription and user roles', async () => {
+  it('prevents multiple key verifications', async () => {
+    // Arrange
+    const interaction = {
+      isModalSubmit: jest.fn().mockReturnValue(true),
+      customId: 'subscriptionKeyModal',
+      user: {
+        id: '231241512',
+        tag: 'testuser#123',
+      },
+      deferReply: jest.fn(),
+      followUp: jest.fn(),
+      fields: {
+        getTextInputValue: jest.fn().mockReturnValue('blah'),
+      },
+      guild: {
+        members: {
+          addRole: jest.fn(),
+        },
+      },
+    } as unknown as ModalSubmitInteraction;
+    const mockGetActiveSubs = jest.mocked(getActiveSubscriptionsByKey);
+    mockGetActiveSubs.mockResolvedValue([
+      {
+        id: 123,
+        name: 'Pro Subscription',
+        sku: '789',
+        userId: '1234567',
+        username: 'anotheruser#456',
+        active: true,
+      } as Subscription,
+    ]);
+    const mockUpdateSub = jest.mocked(updateSubscriptionsCommunityUser);
+    const mockAddRole = jest.mocked(interaction.guild!.members.addRole);
+
+    // Act
+    await verifyCode.execute(interaction);
+
+    // Assert
+    expect(interaction.followUp).toHaveBeenCalledWith({
+      content:
+        'Key **already verified** by another user. Please contact support@morganlatimer.com for assistance.',
+    });
+    expect(mockUpdateSub).not.toHaveBeenCalled();
+    expect(mockAddRole).not.toHaveBeenCalled();
+  });
+
+  it('reports role update errors', async () => {
     // Arrange
     const interaction = {
       isModalSubmit: jest.fn().mockReturnValue(true),
