@@ -16,10 +16,10 @@ describe('interactionCreate', () => {
     // Arrange
     const interaction = {
       reply: jest.fn((opts: InteractionReplyOptions) => {
-        expect(opts.components.length).toBe(1);
-        const row = opts.components[0] as ActionRow<ActionRowComponent>;
+        expect(opts.components?.length).toBe(1);
+        const row = opts.components!.at(0) as ActionRow<ActionRowComponent>;
         const button = row.components.at(0);
-        expect(button.toJSON()).toEqual(
+        expect(button?.toJSON()).toEqual(
           expect.objectContaining({
             custom_id: 'verifyButton',
             label: 'Verify me',
