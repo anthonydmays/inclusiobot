@@ -26,16 +26,14 @@ const event: BotEvent = {
     const subscriptions = await getAllSubscriptionsByUserId(userId);
 
     if (!subscriptions.some((s) => s.active)) {
-      if (!after.member.roles.cache.find((r) => SPECIAL_ROLE_IDS.has(r.id))) {
-        await after.member.roles.set([]);
-
-        console.info(`All roles removed for user ${tag} (${userId}).`);
+      if (after.member.roles.cache.find((r) => SPECIAL_ROLE_IDS.has(r.id))) {
+        console.info(`User ${tag} (${userId}) is in special role.`);
         return;
       }
-    }
 
-    if (!subscriptions.length) {
-      console.warn(`No subscriptions found for ${tag}.`);
+      // User is not in a special role, so remove all roles without an active subscription.
+      await after.member.roles.set([]);
+      console.info(`All roles removed for user ${tag} (${userId}).`);
       return;
     }
 
@@ -64,7 +62,7 @@ const event: BotEvent = {
         subscriptionIds,
       );
     } catch (ex) {
-      console.info(
+      console.error(
         `Failed to update subscriptions for ${tag}.`,
         subscriptionIds,
       );

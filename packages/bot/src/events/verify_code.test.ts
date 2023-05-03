@@ -12,10 +12,8 @@ jest.unstable_mockModule('../models.js', () => ({
   },
 }));
 
-const {
-  getActiveSubscriptionsByKey,
-  updateSubscriptionsCommunityUser: updateSubscriptionsCommunityUser,
-} = await import('../api/wordpress.js');
+const { getActiveSubscriptionsByKey, updateSubscriptionsCommunityUser } =
+  await import('../api/wordpress.js');
 const verifyCode = (await import('./verify_code.js')).default;
 
 describe('verifyCode', () => {
