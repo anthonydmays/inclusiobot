@@ -81,7 +81,7 @@ export async function getAllSubscriptionsByUserId(
 }
 
 function mapApiToSubscription(apiSubscription: WpSubscription): Subscription {
-  const {
+  let {
     id,
     mlc_subscription_name: name,
     mlc_subscription_sku: sku,
@@ -90,6 +90,7 @@ function mapApiToSubscription(apiSubscription: WpSubscription): Subscription {
     mlc_community_username: username,
     mlc_subscription_active: active,
   } = apiSubscription;
+  sku = sku || '';
   return { id, name, sku, customerId, userId, username, active: !!active };
 }
 

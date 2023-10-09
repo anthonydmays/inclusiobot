@@ -21,7 +21,7 @@ export const SPECIAL_ROLE_IDS: ReadonlySet<string> = new Set<string>(
 export interface Subscription {
   id: number;
   name?: string;
-  sku?: string;
+  sku: string;
   customerId?: number;
   username?: string;
   userId?: string;

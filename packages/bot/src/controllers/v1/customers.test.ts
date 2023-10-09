@@ -329,6 +329,13 @@ describe('customers', () => {
 
 const TEST_SUBSCRIPTIONS: Subscription[] = [
   {
+    id: 135,
+    sku: '',
+    name: 'name0',
+    userId: 'userid7',
+    active: true,
+  },
+  {
     id: 567,
     sku: 'SKU1',
     name: 'name2',
