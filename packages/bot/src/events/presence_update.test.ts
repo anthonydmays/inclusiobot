@@ -123,6 +123,7 @@ describe('presenceUpdate', () => {
     jest.mocked(getAllSubscriptionsByUserId).mockResolvedValue([
       {
         id: 256,
+        sku: '',
         active: true,
         userId: '12345',
         username: 'testuser#123',
@@ -148,6 +149,7 @@ describe('presenceUpdate', () => {
     jest.mocked(getAllSubscriptionsByUserId).mockResolvedValue([
       {
         id: 456,
+        sku: '',
         active: true,
         userId: '12345',
         username: 'testuser#456',
@@ -176,12 +178,14 @@ describe('presenceUpdate', () => {
     jest.mocked(getAllSubscriptionsByUserId).mockResolvedValue([
       {
         id: 256,
+        sku: '',
         active: true,
         userId: '12345',
         username: 'testuser#123',
       },
       {
         id: 456,
+        sku: '',
         active: true,
         userId: '12345',
         username: 'testuser#456',
@@ -210,6 +214,7 @@ describe('presenceUpdate', () => {
     jest.mocked(getAllSubscriptionsByUserId).mockResolvedValue([
       {
         id: 456,
+        sku: '',
         active: true,
         userId: '12345',
         username: '',
