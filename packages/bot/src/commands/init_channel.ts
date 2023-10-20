@@ -31,7 +31,7 @@ const command: SlashCommand = {
 export const VERIFY_MESSAGE = `>>> *Verify membership*
      
 In order to receive your role, please login to your account at 
-[morganlatimer.com](https://morganlatimer.com) and copy the code from the Downloads
+[morganlatimer.com](https://morganlatimer.com) and copy the code from the My Subscription
 section.
     
 Click the button below to start verification.`;
